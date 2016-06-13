@@ -1,0 +1,333 @@
+
+Euchre Server Changes File
+
+---------------------------------------------------------------------------
+
+version 0.1
+
+  February 24, 1999
+  Denis McLaughlin
+   - Initial Makefile and include file implementation
+   - added debug() macro
+
+  February 26, 1999
+  Denis McLaughlin
+   - reorganized include files
+   - initialization routines
+
+  February 27, 1999
+  Denis McLaughlin
+   - completed config file read routines
+
+  February 28, 1999
+  Denis McLaughlin
+   - completed switch processing
+   - munged around with the log stuff, got it to where it logs
+     stuff by default to the file, but will use stderr if the
+     file cannot be opened, and will use stderr in addition to
+     the file is debugging is turned on
+   - I do believe we're ready for some euchre type stuff!
+
+  May 4, 1999
+  Denis McLaughlin
+   - modified make file to also turn tags into tags.vim, to allow
+     syntax highlighting for internal functions
+
+  May 6, 1999
+  Denis McLaughlin
+   - changed make file to automate generation of prototypes (this
+     only works for my coding style)
+   - created makescripts directory for tags2html and mkproto scripts
+   - fixed SOURCE and SRC variable misnaming in Makefile
+   - added distclean as a target: realclean, but also deletes
+     the vim swap files (even if edit session still active)
+   - tightened up the lomem() routine
+   - rewrote parts of the Implementation document
+   - the server will be single game only, although the protocol will
+     be sufficient for a server running multiple games
+
+  May 7, 1999
+  Denis McLaughlin
+   - added game and player structure, along with initialization and
+     printing routines for both
+
+  May 8, 1999
+  Denis McLaughlin
+   - nicely streamlined the configuration section
+   - added a Usage() routine, and hooked it up to the getopt routine.
+   - fixed option processing for debug: could be turned on or off in
+     config file, but only turned on via command line
+   - fixed ordering in Exit() routine
+   - fixed server socket open
+
+  May 9, 1999
+  Denis McLaughlin
+   - started the PlayGame() routine, which calls the DoSelect: the 
+     server can now detect incoming clients
+   - woo hoo, the server accepts new clients, up to a maximum of four
+     and then starts to decline them: gotta snag the IP
+
+  May 10, 1999
+  Denis McLaughlin
+   - added the IP detection routines
+   - added a fflush() to the log file
+   - added signal handling routines for SIGHUP and SIGINT
+   - starting the first client
+
+  May 11, 1999
+  Denis McLaughlin
+   - added a comment field to the player structure, for players to use
+     to describe themselves: "Whup-Ass Beverage Service"
+   - on more thought, added several new items: pstate, which can be one
+     of unconnected, connected, or joined (see Implementation), msgwait,
+     a boolean which is set true whenever the server is waiting for a
+     response from the client, msgtime, the time when the request was
+     sent to the client
+   - added a pollinterval value: this is the maximum time we wait in the
+     select() function before coming up to do other processing
+   - next: add client timeout
+
+  May 12, 1999
+  Denis McLaughlin
+   - the client timeout works, but the message being sent isn't correct:
+     how to pack an int at the start of string?
+   - memcpy.  kuh
+
+  May 13, 1999
+  Denis McLaughlin
+   - reorganized some of the code: socket.c is for code that directly
+     manipulates sockets, message.c is for code that directly composes
+     and sends messages, client.c is the per client manipulation routines,
+     and game.c runs the game: game calls client calls message calls socket
+   - time to hookup a client
+
+  May 18, 1999
+  Denis McLaughlin
+   - Added code to accept and process client requests
+
+  May 19, 1999
+  Denis McLaughlin
+   - fixed select filedescriptors
+   - reorganized client request code
+   - separated client removal
+   - tweaked mkproto
+   - added JOIN, JOINDENY and JOINACCEPT routine
+
+  May 21, 1999
+  Denis McLaughlin
+   - created msgc2pl script and modified makefile to generate perl version
+ 
+  May 27, 1999
+  Denis McLaughlin
+   - added the SEND debug message
+   - hmmm, I'm going to have to think how ints should be represented:
+     shouldn't be too awkward to send them in network byte order, I
+     hope
+
+  May 31, 1999
+  Denis McLaughlin
+   - added a PackInt() and PackString() routine, to massage data before
+     dumping it on the net: cleans up the message preparation routines
+     nicely
+   - added client socket close()es to the Exit() routine
+   - added a PrintBuffer() routine
+   - changed scratch1[] to tbuffer1[] (etc.), and introduced char *dbuffer[]
+   - message sending works, woo hoo!
+
+ June 1, 1999
+ Denis McLaughlin
+  - fixed the max macro to (ahem) return the correct value
+  - tweaked the maxfd stuff: multiple clients can properly connect and join
+
+ June 5, 1999
+ Denis McLaughlin
+  - all network bytes being read are also byte order munged
+  - added log message when client joins
+  - duplicate join detection added: ignored for the moment
+  - server removes disconnected clients, detected via select() and
+    via write() (EPIPE, since we ignore SIGPIPE)
+  - server sends a SERVERQUIT to all connected clients at time of exit
+  - server can process a CLIENTQUIT
+
+  June 6, 1999
+  Denis McLaughlin
+   - added ReadInt() and ReadString()
+   - added processing of ID message
+
+  June 13, 1999
+  Denis McLaughlin
+   - fixed bug in ClientQuit()
+   - any time a string is longer than maxmsglen, kill the client
+   - server can now receive and rebroadcast a chat message
+
+  June 14, 1999
+  Denis McLaughlin
+   - wrote up initial spec for STATE message from server
+
+  June 15, 1999
+  Denis McLaughlin
+   - all strings transmitted as part of the protocol are immediately
+     preceded by an integer representing their length; clients cannot
+     assume they will be null terminated
+   - shit, rewrite the ID message to conform to the above
+   - oops, my mistake, it already works
+   - further tweaking of the state message, until I spilled a glass
+     of water
+
+  June 27, 1999
+  Denis McLaughlin
+   - added the suits.h file
+   - create Card structure
+   - completed PackCards() and PackCard()
+   - tweaked Makefile to generate suits.pl file
+   - split the packing routines into pack.c
+   - reformatted the JOIN message to include user name (so that we can
+     announce the player to existing players
+   - fixed bug with ID broadcasts
+   - fixed bug with unexpected disconnect logging
+
+  June 29, 1999
+  Denis McLaughlin
+   - changed all outgoing messages to be preceded by message lengths,
+     even if the only data is a string (with its own length)
+   - accomodated client message changes from <gh> <ph> <msglen> to
+     <msglen> <gh> <ph>
+
+
+  July 6, 1999
+  Denis McLaughlin
+   - changed message format to have the <msglen> as the first rather
+     than the second byte: since I'm catering to message consumers
+     wrt pre-assuring sufficient message data, I might as well do it
+     right
+   - also fixed a bug in state ending routine
+   - added fragmented message routines
+   - hmmm, things are still broken for a partial and a complete message,
+     since the server mungs the two together, resulting in two broken
+     messages; I should have a garbage count, when more than maxbadmsg
+     is received, the client is dropped
+   - fixed bug with unexpected client disconnects
+   - hmmm, better put a sleep in the routine: when a partial packet is
+     received, the server will spend up to maxmsgwait seconds tightlooping,
+     but I don't want to torch responsiveness for just one client
+
+  July 27, 1999
+  Denis McLaughlin
+   - Added define for TAIL
+   - Added SO_REUSEADDR on socket
+
+  July 28, 1999
+  Denis McLaughlin
+   - Changed names so they are always set to something
+   - Added tests for null-name resets
+   - Created ReadShort()
+   - Changed ReadInt(), ReadShort(), and ReadString() to check that
+     there are sufficient bytes for their needs: clients are kicked if
+     there is not; I think the server is fairly robust in this regard
+   - Neatened up the reading routines
+   - Completed tails on incoming messages
+   - Added PackShort()
+   - Completed tails on outgoing messages
+
+  July 29, 1999
+  Denis McLaughlin
+   - Added outgoing state message to join and id processing
+   - fixed PackString() to pack null strings
+
+  July 31, 1999
+  Denis McLaughlin
+   - minor change to STATE message
+   - completed outgoing state message for players and game state
+
+  August 2, 1999
+  Denis McLaughlin
+   - added support routines for kicking players
+
+  August 3, 1999
+  Denis McLaughlin
+   - added support for OPTIONS client message, and send out OPTIONSDENY
+     at appropriate times
+   - tweaked default options: farmers is off by default
+   - woohoo, the Implementation document is now larger than the License
+     document
+
+  August 9, 1999
+  Denis McLaughlin
+   - added Start routines
+   - added card shuffle, add, remove and check routines
+
+  August 10, 1999
+  Denis McLaughlin
+   - tweaked card routines
+   - created hand structure
+   - modified state message to include hole card, trump, and player pass state
+
+  August 11, 1999
+  Denis McLaughlin
+   - added state send at end of start processing
+   - added cards to state message
+   - added next state computation: shaky, I'm sure, but present 
+
+  August 12, 1999
+  Denis McLaughlin
+   - added game reset when all clients disconnect
+   - added game end and and game end deny message support
+
+  August 14, 1999
+  Denis McLaughlin
+   - added ordering support, it even mostly works
+
+  August 15, 1999
+  Denis McLaughlin
+   - tweaked hand states to be 0 through 4 (can't pass negatives?)
+   - changed farmers option to be screw the dealer
+   - passing works for orders and calls
+   - defending passes work
+   - tweaked NextPlay()
+   - added PickLeader()
+   - removed cangoalone as an option
+   - forced go alone if order partner and option set
+   - added play processing, as well as invalid card detection
+
+  August 16, 1999
+  Denis McLaughlin
+   - fixed up card following routines
+   - wrote card evaluation routine
+
+  August 17, 1999
+  Denis McLaughlin
+   - added trick counters to hand structure and state message
+   - added hand and game completion code
+   - partial testing of hand completion
+
+  August 18, 1999
+  Denis McLaughlin
+   - added card dropping
+   - added trump calling
+   - fixed bug computing previous player with (current-1)%
+   - fixed bug computing next player
+   - fixed bugs with hand and game completion
+   - I played my first full game!
+
+  August 19, 1999
+  Denis McLaughlin
+   - added trickover, handover and gameover messages
+   - reset game after a win
+   - added hand folding logic
+
+  August 21, 1999
+  Denis McLaughlin
+   - added card sorting
+   - fixed bug with defend offers
+   - changed chat message header for server
+   - bumped version to 0.8, preparatory to public alpha testing
+
+version 0.8
+
+  August 26, 1999
+  Denis McLaughlin
+   - added playoffer, defendoffer, calloffer, orderoffer, dropoffer
+     and deal messages: all intended to initiate local client animations,
+     not critical for game play
+
+Version 0.9

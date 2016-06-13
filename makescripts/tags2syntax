@@ -1,0 +1,3 @@
+#!/bin/sh
+
+awk '{if ($NF == "v" || $NF == "d") print "syntax keyword PreProc "$1 ; if ($NF == "f") print "syntax keyword Tag "$1}'

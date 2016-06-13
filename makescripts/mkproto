@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# A short'n'dorky script to generate a proto.h with function prototypes 
+# sorted by function name.
+#
+# Quite fragile wrt coding style: I only have functions, comments, braces,
+# whitespace, and fprintfs flush on the right margin, and can thus filter
+# out the function prototypes.
+#
+# Call it with: mkproto > proto.h
+
+echo "
+/*
+ * (C) Copyright 1999 Denis McLaughlin
+ */
+
+"
+
+grep '^[^*#{}/ 	]' *.c | grep -v printf | sed -e 's/^.*://' -e 's/$/;/' | sort +1

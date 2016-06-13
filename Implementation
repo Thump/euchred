@@ -1,0 +1,679 @@
+
+---------------------------------------------------------------------------
+General Assumptions ------------------------------------------------------- 
+
+ - An individual client are never given enough information to cheat.
+
+ - It would be impossible to reasonably prevent a single system from
+   initiating multiple clients, so no effort will be made to stop this.
+
+ - The server may actively check for cheating clients.
+
+ - The server (for the moment) is dedicated to running a singe
+   game for four real players.  No kibitzing, no robots.  A
+   future enhancement will allow a single server to host multiple
+   games.  This will probably require a server rewrite.  The protocol
+   was intended to be sufficient for a single server to maintain 
+   multiple games, meaning all incoming messages are marked with a
+   user and game handle.
+
+ - Players can chat while waiting for others to join the game.
+
+ - Players can change their name multiple times: this might get
+   confusing for humans, but so what.
+
+ - It is interesting for the server to gather and report statistics
+   on the game, players and hands.
+
+ - The server should remain robust across client failures.  This includes
+   allowing users to dropout, and others joining in during a game, 
+   without interrupting the game.
+
+ - The server's player structure has three states: unconnected, connected,
+   and joined.  At initialization, with no clients, all players are
+   unconnected.  When a client connection is made, the associated player
+   structure moves into the connected state.  Once the client has sent
+   its JOIN request and been accepted, it moves into a joined state.
+
+   When the player first connects and moves into the connected state,
+   the .msgsent field is timestamped.  If more than joinwait seconds
+   passes with no join request, the player is kicked off.
+
+ - There should not be any visible indication of AI versus human players.
+   No client should be allowed this information in order to automate play:
+   if a player (either human or AI) can distinguish the nature of its
+   opponents, so much to its good.  A sufficiently advanced AI should not
+   be outed by the server: if it can maintain the pretense, so much to its
+   good.
+
+---------------------------------------------------------------------------
+Network Protocol Assumptions ---------------------------------------------- 
+
+ - Because we do not trust the client, most client-to-server messages
+   can either be accepted or denied.  This means the server will always
+   reply either positively or negatively, to any client request, and a
+   well written client should always check for this response.
+
+   Some messages are implicitly accepted unless denied: ID, CHAT.
+
+ - For all server-to-client messages, there are no responses expected.
+   Those messages (such as, for example, offers to choose trump) which
+   would require a reply will be timed, and if the time limit expires,
+   the server will assume an appropriately null response.
+
+ - There are two types of handles: player handle, game handle, which are
+   initially sent from the server to the client, and then sent from the
+   client to the server with each appropriate message.  Initially the
+   server will be single game, but requiring each incoming (from server's
+   pov) request to be labeled with a handle allows a single server to
+   handle multiple games.
+
+ - A player's client need not locally echo an outgoing chat message, as
+   the message will be uniformly sent to all players.  This simplifies
+   both the client and the server.
+
+ - The messages are intended to enable either an integrated or split lobby
+   and euchre client.
+
+ - The client's join request is:
+   <msg>      : <msglen> <msgid> <protocol> <name> <tail>
+     <msglen>   : a signed four byte integer in network order representing
+                  the length of the rest of the message, not including the
+                  msglen integer itself.
+     <msgid>    : JOIN
+     <protocol> : a signed int, four bytes long, containing the protocol
+                  version; the initial protocol version is 1, and no
+                  other protocol is defined (as of May, 1999)
+     <name>     : <string>
+       <string>   : <strlen> <data>
+         <strlen> : four byte signed integer representing the lenght of
+                    the string data
+         <data> : the string data itself
+     <tail>     : a two byte sequence: the first byte is equal to 60912,
+                  the second is equal to 3840.
+
+ - All messages, with the exception of the JOIN message, described above,
+   from the client to the server will be of the following form:
+
+   <msg>     : <msglen> <msgid> <gh> <ph> <data> <tail>
+     <msglen>  : a signed int, four bytes long, set to the length of the
+                 remainder of the message as measured in bytes (ie. the
+                 data), not including <msglen> int itself
+     <msgid>   : an int, four bytes long, can only validly be set to
+                 one of the values in #include "../common/messages.h"
+     <gh>      : a signed int, four bytes long, the game handle for the game
+                 the client is in, provided by the server in the response
+                 to the client's join request
+     <ph>      : a signed int, four bytes long, the player handle for the
+                 game the client is in, provided by the server in the
+                 response to the client's join request
+     <data>    : freeform data, <msglen> bytes in length 
+
+ - All messages from the server to the client will be of the following
+   form:
+
+   <msg>    : <msglen> <msgid> <data> <tail>
+     <msglen> : an int, four bytes long, set to the length of the
+                remainder of the message as measured in bytes (ie. the
+                data), not including <msglen> int itself
+     <msgid>  : an int, four bytes long, can only validly be set to
+                one of the values in #include "../common/messages.h"
+     <data>   : freeform data, <msglen> bytes in length 
+
+ - The first byte of each message is the message length.  This allows
+   message consumers to read one integer in order to check if the entire
+   message is present before attempting to read it all.  If the entire
+   message is not present, the message can be left on the stack with
+   an appropriate length flag set to indicate that the length integer
+   has already been read.
+
+ - Following this length integer, the next integer indicates the type 
+   of message, allowing message consumers to use dumb generic message
+   parsing routines.
+
+ - The last two bytes compose an unsigned short equal to 3991932672.
+   This is the tail, and is required on all messages exchanged between
+   clients and servers.
+
+ - If a client violates message protocol, it may be dropped.  Violations
+   include:
+    . improperly calculated message lengths
+    . missing message lengths
+    . missing tails.
+
+ - Clients can choose what to do in the event of server violating the
+   protocol.
+
+ - The tail is intended to reasonably prevent mangled messages
+   from being misparsed.  It could be used to allow a client or server
+   to resynchronize the network stream after some disaster.  However,
+   since there is no requirement that tails will not appear in the
+   contents of the message data, resynchronizing the network stream may
+   be difficult.  Attempting to only allow tail-data in the tail would
+   complicated the sending and receiving routines, and I don't think
+   the effort is worth the result.
+
+ - The <string> data type is composed of a a four byte signed integer
+   indicating the string's length, followed by the string itself.
+   Clients should not rely on strings being null terminated, nor
+   should they particularly concern themselves whether they send
+   null-terminated strings.  Having clients and servers use explicitly
+   sized strings avoids a brittle reliance on null-termination, making
+   the protocol more robust to poorly implemented clients.  It also
+   allows string storage to be explicitly malloced prior to reading the
+   data, which simplifies string reading, and makes it easier to defend
+   against stack overflows.  It also allows servers and clients to
+   intentionally disregard accidently or maliciously oversized messages.
+
+ - By the nature of the game, the server must at times wait for a client
+   to respond to a request (offer of hole, offer of trump, etc).  I
+   don't want a bad client or a flaky network to slow or stop the game.
+   This could be implemented using timers, but that involves interrupts,
+   and would, I think, be a serious pain.
+
+   Instead, I'm going to try to use select with time limits: I will always
+   call select() with, say, a 5 second limit (make it configurable).  When
+   a message goes to a client, a flag will be set in its player structure
+   indicating a response is outstanding, and the current time will be
+   stamped on it.  Every 5 seconds, when the select() returns, a utility
+   function can process these, kicking players as needed.  This limit
+   should be configurable.
+
+   This nicely handles the problem of disconnected clients.  This could mung
+   things up with a single game server.
+
+   The larger the pollinterval value, the lower the CPU load is, but
+   the more inaccurate the msgwait and joinwait measurements are, since
+   they can range as high as msgwait+pollinterval and joinwait+pollinterval,
+   respectively.  I'm guessing 5 seconds will be okay.
+
+ - Not all parameters will be modifiable on the command line, only the
+   basic functions.  I believe the current set covers that nicely:
+   debug, verbosity, port, log file, config file.
+
+ - The protocol supports a protocol version: it is transmitted as part
+   of a client's JOIN request as an integer.  Thus the JOIN request,
+   followed immediately by a protocol version, is the only consistent
+   protocol specs that must remain unchanged between protocol versions.
+
+   As currently written, the server supports all protocols equal to or
+   less than the protocol global variable.  We'll see how well this
+   holds up when the protocol changes after release.
+
+ - All ints are transmitted as 4 byte sequences in network byte order,
+   all clients are expected to receive and interpret accordingly.
+   Be cautious about developing and testing client and server on the
+   same system, as this can mask a byte ordering dependency.
+
+ - All strings transmitted as part of the protocol are composed of an
+   integer representing their length, followed by the text itself.
+   Clients cannot assume that server-sourced strings will be null
+   terminated, and it does not matter if the client-sourced strings
+   are.
+
+
+---------------------------------------------------------------------------
+Protocol Descriptions -----------------------------------------------------
+
+  The following two sections describe in detail the protocol messages
+sent between the client and server.  The first section describes those
+originating with the client, and the second, those that originate with
+the server.
+
+  I use a quasi-BNF format: tags enclosed in <> are symbolic of other,
+real data.  Comments are occasionally included after a #. Tags which
+have been previously described, such as <gh> and <ph>, are not detailed;
+if you see an unexpanded tag, look for it previously in the text.  This
+implies a global namespace for all tags, which I am not sure I have
+strictly adhered to.  The tags in upper case, such as JOIN or ID, are
+message identifiers, defined in ../common/messages.h.  Unless indicated
+otherwise, all numbers are 4 byte integers, which are communicated in
+network byte order.  Indenting is used to make the protocol a little
+easier to read.  In all cases, the source has precedence over this
+document.
+
+
+---------------------------------------------------------------------------
+Client to Server Messages ------------------------------------------------- 
+
+*****
+
+  JOIN | JOINDENY | JOINACCEPT
+    The join request is sent by the client.  It consists only of the 
+    <JOIN> message, followed by a four byte signed integer protocol
+    version, of which only a value of 1 is currently (May 1999) defined:
+
+      <msg> : <msglen> <JOIN> <protocol> <name> <tail>
+        <protocol> : a four byte signed integer, equal to protocol version
+        <name> : <string> # player's initial name
+          <string> : <textlen> <text>
+
+    The server response is either a decline, with an optional message:
+
+      <msg> : <msglen> <JOINDENY> <string> <tail>
+
+    or the server will respond with an accept:
+
+      <msg> : <msglen> <JOINACCEPT> <gh> <ph> <team> <tail>
+
+    The join request is valid in the pregame, not valid in the game or
+    the post game.
+
+*****
+
+  CLIENTQUIT
+    The client quit message is sent by clients.  When the server receives
+    it, it cleans up that client's player structure and logs the reason.
+    No reply is sent to the client.  The message consists of a message
+    identifier, a message length, and a reason.
+
+      <msg> : <msglen> <CLIENTQUIT> <gh> <ph> <string> <tail>
+
+*****
+
+  ID
+
+    This message is sent by the client to set the player's name, the
+    player's client name, the player's hardware, the player's OS, and
+    an optional comment string.
+
+      <msg> : <msglen> <ID> <gh> <ph> <data> <tail>
+        <data> : <len> <textdata>
+          <len> : <namelen> <clientlen> <hwlen> <oslen> <cmtlen>
+          <textdata> : <nmstring> <clstring> <hwstring> <osstring> <cmtstring>
+            <nmstring> : <string>  # player's name
+            <clstring> : <string>  # client name
+            <hwstring> : <string>  # hardware type
+            <osstring> : <string>  # OS type and version
+            <cmtstring> : <string> # miscellaneous comment
+
+    The ID message is valid at any point during the game.
+
+*****
+
+  CHAT
+
+    The client chat message is sent from the client to the server when a
+    client wants to send a message to all the other clients.  There is
+    no concept of a private message, so all chats are broadcast to all
+    other players.  The string should only contain the message itself:
+    the server will take care of adding the "foo: " header.  (This is
+    so we don't rely on the client doing it, and then doing it wrong.)
+    Clients should not locally display outgoing chats: the server will
+    rebroadcast to all clients.  This simplifies the client, simplifies
+    the server, and provides a client feedback mechanism.  No reply is
+    sent to the originating client.  The message consists of a message
+    identifier, a message length, and a reason.
+
+      <msg> : <msglen> <CHAT> <string> <tail>
+
+*****
+
+  KICKPLAYER | KICKDENY
+
+    This message is sent from a client to the server, to request that
+    a player be kicked off.  This will initially only be allowed for the
+    game creator, although we could mung something together to allow
+    voting.  Not needed right now.  Should probably be active in pre-game,
+    but no rush.
+
+      <msg> : <msglen> <KICKPLAYER> <gh> <ph> <targetph> <tail>
+
+    If the server accepts the kick, the user will see notification via
+    a chat message.  If there is a problem, the server will respond with
+    a KICKDENY:
+
+      <msg> : <msglen> <KICKDENY> <string> <tail>
+
+    where <string> contains the text of the reason for denial.  No
+    other action is taken.
+ 
+
+*****
+
+  OPTIONS
+
+    The client sends this message when it wants to set the options for
+    the game.  Only the creator should be allowed to set the options:
+    if the client interface doesn't enforce this, the server will. 
+    Options can be set before the game, but not during.
+
+      <msg> : <msglen> <OPTIONS> <gh> <ph> <candefendalone>
+              <aloneonorder> <screw> <tail>
+        <candefendalone>|<aloneonorder>|<screw> : <boolean>
+
+    The server can accept these options, in which case no reply is sent
+    (no explicit reply: after the options message is accepted, a state
+    message will be sent to update all clients), or it can reply with an
+    OPTIONSDENY message:
+
+      <msg> : <msglen> <OPTIONSDENY> <string> <tail>
+
+*****
+
+  START
+
+    The client sends this message when it wants to start the game.
+    Only the creator can start the game, and only if there are four
+    four players and no game currently in progress.
+
+      <msg> : <msglen> <START> <gh> <ph> <tail>
+
+    The server can start the game, in which case no reply is sent
+    (no explicit reply: after the start message is accepted, a state
+    message will be sent to update all clients with start-relevant
+    information), or it can reply with a STARTDENY message:
+
+      <msg> : <msglen> <STARTDENY> <string> <tail>
+
+*****
+
+  END
+
+    The client sends this message when it wants to end the game.
+    Only the creator can end the game, and only if the game is
+    currently in progress.
+
+      <msg> : <msglen> <END> <gh> <ph> <tail>
+
+    The server can end the game, in which case it will send a server
+    quit message to all players and terminate their connections, or
+    it can reply with a STARTDENY message:
+
+      <msg> : <msglen> <ENDDENY> <string> <tail>
+
+*****
+
+  ORDER|ORDERALONE|ORDERPASS
+
+    The client sends one of these messages as a response to the order
+    offer.
+
+      <msg> : <msglen> <ORDER|ORDERALONE|ORDERPASS> <gh> <ph> <tail>
+
+    In the event of an error, the server will respond with an ORDERDENY,
+    specifying the reason for the denial.
+
+      <msg> : <msglen> <ORDERDENY> <string> <tail>
+
+*****
+
+  CALL|CALLALONE|CALLPASS
+
+    The client sends one of these messages as a response to the call
+    offer.
+
+      <msg> : <msglen> <CALL|CALLALONE> <gh> <ph> <suit> <tail>
+      <msg> : <msglen> <CALLPASS> <gh> <ph> <tail>
+
+    In the event of an error, the server will respond with an CALLDENY,
+    specifying the reason for the denial.
+
+      <msg> : <msglen> <CALLDENY> <string> <tail>
+
+*****
+
+  DEFEND|DEFENDPASS
+
+    The client sends one of these messages as a response to the defend
+    offer.
+
+      <msg> : <msglen> <DEFEND|DEFENDPASS> <gh> <ph> <tail>
+
+    In the event of an error, the server will respond with an DEFENDDENY,
+    specifying the reason for the denial.
+
+      <msg> : <msglen> <DEFENDDENY> <string> <tail>
+
+*****
+
+  DROP
+
+    The client sends this message as a response to the drop offer.
+
+      <msg> : <msglen> <DROP> <gh> <ph> <card> <tail>
+
+    In the event of an error, the server will respond with an DROPDENY,
+    specifying the reason for the denial.
+
+      <msg> : <msglen> <DROPDENY> <string> <tail>
+
+*****
+
+  PLAY
+
+    The client sends this message as a response to the play offer.
+
+      <msg> : <msglen> <PLAY> <gh> <ph> <card> <tail>
+
+    In the event of an error, the server will respond with an PLAYDENY,
+    specifying the reason for the denial.
+
+      <msg> : <msglen> <PLAYDENY> <string> <tail>
+
+
+---------------------------------------------------------------------------
+Server to Client Messages ------------------------------------------------- 
+
+*****
+
+  DECLINE
+
+    The server sends this to a client if the client has connected
+    to the game but cannot be allowed to join.  This would be sent
+    for some pre-JOIN reason for refusal, such as a game being full
+    up.  <DECLINE> is a four byte integer, <msglen> is a four byte
+    integer corresponding to the length of <string>, <string> is a null
+    terminated text string defining the reasons why the client has been
+    declined.  No response is expected from the client.
+
+      <msg> : <msglen> <DECLINE> <string> <tail>
+
+*****
+
+  SERVERQUIT
+
+    The server sends this to all clients when it is exiting.  <SERVERQUIT>
+    is a four byte integer, <string> is a null terminated text
+    string defining the reasons why the server has quit.  No response
+    is expected from the client.
+
+      <msg> : <msglen> <SERVERQUIT> <string> <tail>
+
+*****
+
+  KICK
+
+    This request is sent from the server to a connected or a joined
+    client.  It indicates that the player is being forcibly removed
+    from the game.  Possible reasons for this include:
+     - request from game creator, or from voting system
+     - JOIN timeout
+     - message greater than maxmsglen
+
+    This message can be sent at any time.
+
+      <msg> : <msglen> <KICK> <string> <tail>
+
+*****
+
+  STATE
+
+    This message is sent from the server to the client when a server
+    game state change necessitates it (when it will be sent to all clients)
+    or when an individual client requests it (when it will be sent only
+    to that client).  It comprises all details about game and player state.
+    Because of the dependency on player client structure, this will not
+    simply be a dump of the server's game and players[] data structures.
+
+      <msg> : <msglen> <STATE> <statedata> <tail>
+        <statedata> : <playersdata> <gamedata> <cards>
+          <playersdata> : <p1> <p2> <p3> <p4>
+            <pN> : <pstate> <pdata>
+              <pstate> : {0|1|2} # unconnected, connected, joined
+              <pdata> : if <pstate> == joined
+                          <ph> <nmstring> <clstring> <hwstring> <osstring>
+                          <cmtstring> <team> <numcards> <creator> <ordered>
+                          <lead> <maker> <alone> <defend> <deal> <offer>
+                          <passed>
+                        else
+                          <NULL>
+                <NULL> :  # no data
+                <team> : {-1|0|1} # no team, team 0, or team 1
+                <creator>|<ordered>|<dealer>|<alone>|<defend>|<lead>|<maker>
+                <playoffer>|<orderoffer>|<calloffer>|<defendoffer> : <boolean>
+          <gamedata> : <ingame> <suspend> <holein> <hole> <trumpset> <trump>
+                       <tricks> <score> <options>
+            <ingame> : <boolean>
+            <hstate> : <0|1|2|3|4> # pregame,hole,trump,defend,play
+            <suspend> : <boolean>
+            <holein> : <boolean> # true if hole card
+            <hole> : <card> # only packed if <holein> true
+            <card> : <value> <suit>
+              <value> : {2|3|4|5|6|7|8|9|10|11|12|13|14}
+              <suit> : {0|1|2|3}
+            <trumpset> : <boolean> # true if trump set
+            <trump> : <suit> # only packed if <trumpset> true
+            <tricks> : <tricks0> <tricks1>
+              <tricks0> : # tricks for team 0
+              <tricks1> : # tricks for team 1
+            <score> : <team0> <team1>
+              <team0> : # score of team 0
+              <team1> : # score of team 1
+            <options> : <alone> <defend> <aloneonorder> <screw>
+              <alone>|<defend>|<aloneonorder>|<screw> : <boolean>
+          <cards> : <numcards> <card1> .. <cardN>
+            <cardN> : <value> <suit>
+
+*****
+
+  TRICKOVER
+
+    The server sends this to the client to indicate the trick is over.
+    The client is not expected to respond to this message: it is merely
+    to allow them to take special care that the player can see the cards
+    before the are overwritten with the next state message that will have
+    removed each player's cardinplay.  As an example, when the peuchrec
+    client receives this message, it prompts the user to continue before
+    overwriting the screen contents.
+
+      <msg> : <msglen> <TRICKOVER> <tail>
+
+*****
+
+  HANDOVER
+
+    The server sends this to the client to indicate the hand is over.
+    The client is not expected to respond to this message: it is merely
+    to allow them to do anything special required at the end of a hand.
+    Although the peuchrec client makes no use of this, a possible example
+    would be to animate cards moving to the winning players position.
+
+      <msg> : <msglen> <HANDOVER> <tail>
+
+*****
+
+  PLAYOFFER
+  DEFENDOFFER
+  CALLOFFER
+  ORDEROFFER
+  DROPOFFER
+  DEAL
+
+    These messages are informational messages from the server to the client.
+    They are not expected to influence game play: the information in these
+    messages can always be derived from the state message.  The purpose of
+    these messages is to allow client authors to use these messages as
+    triggers for client side animations, sound effects, or other client
+    specific chrome.  These messages are only sent once, and are not resent
+    to clients who reconnect, thus it is important that clients never rely
+    on these messages to initialize their state.
+
+      <msg> : <msglen> <PLAYOFFER> <pnum> <tail>
+      <msg> : <msglen> <DEFENDOFFER> <pnum> <tail>
+      <msg> : <msglen> <CALLOFFER> <pnum> <tail>
+      <msg> : <msglen> <ORDEROFFER> <pnum> <tail>
+      <msg> : <msglen> <DROPOFFER> <pnum> <tail>
+      <msg> : <msglen> <DEAL> <tail>
+
+    There is no expected response to the server from these messages, and
+    simple clients (ie. peuchrec) may freely ignore them.
+
+
+---------------------------------------------------------------------------
+Program Flow -------------------------------------------------------------- 
+
+ - pregame
+   - initialize
+     - parse configuration file
+     - parse command switches 
+     - initialize data structures
+   - open listening sockets
+   - wait for users, and allow chatting
+
+ - game
+   - prehand
+     - initialize deck
+     - deal hand
+     - choose dealer if needed
+     - display hole card
+     - choose trump
+       - offer hole
+       - offer call
+       - offer defend
+   - hand
+     - trick
+       - offer play
+       - wait for card
+       - check if valid
+         - player owns card
+         - player not reneging
+       - communicate card
+   - posthand
+     - assign scores
+     - clear hand
+     - check if finished
+
+ - postgame
+   - inform people of the score
+   - clear the hand and reset the game
+
+
+---------------------------------------------------------------------------
+Server Data Structures ---------------------------------------------------- 
+
+#include <euchres.h>
+
+
+---------------------------------------------------------------------------
+Coding Style --------------------------------------------------------------
+
+ Not that it matters, but...
+
+ - tabstops should be set at 4
+ - single-line comments are bracketed with '/*' and '*/'
+ - multi-line comments begin with '/*', additional lines are begun with
+   ' *', and are finished with ' */' either on the same line as the 
+   trailing comment, or on the line below
+ - comments are typically not separated from the code they illuminate
+ - function names are munged together with capitalization (DoSelect),
+   while variable names are munged together without capitalization
+   (calloffer)
+
+
+---------------------------------------------------------------------------
+Future -------------------------------------------------------------------- 
+
+ - change the boolean network type to a single byte rather than 4
+ - add stats
+ - player affinity, rebinding clients to player slots based on IP and
+   name: prevents users from swapping positions
+ - offer timelimits: put a timelimit on outstanding player offers
+ - robustify the server to users dropping in the middle
+ - exchange current lomem macro with two: one for situations where a
+   a low memory condition aborts the game, and one where it doesn't
+ - an IP deny list, to configure clients who can or can't play
+ - an observer port, to collect current games and score
+ - a GTK client
+ - a C library with protocol routines
+ - AI players

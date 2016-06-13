@@ -1,0 +1,117 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.2.3	//
+AddChat	screen.pl	/^sub AddChat$/;"	s
+CTAGS	Makefile	/^CTAGS=..\/makescripts\/perltags$/;"	m
+CTAGSFILE	Makefile	/^CTAGSFILE=.\/tags$/;"	m
+CallDeny	client.pl	/^sub CallDeny$/;"	s
+CallOffer	client.pl	/^sub CallOffer$/;"	s
+CallSuits	screen.pl	/^sub CallSuits$/;"	s
+Card	screen.pl	/^sub Card$/;"	s
+CardToType	screen.pl	/^sub CardToType$/;"	s
+Chat	client.pl	/^sub Chat$/;"	s
+Choices	screen.pl	/^sub Choices$/;"	s
+Choose	config.pl	/^sub Choose$/;"	s
+ClearGame	config.pl	/^sub ClearGame$/;"	s
+ClearPlayer	config.pl	/^sub ClearPlayer$/;"	s
+ClearS	socket.pl	/^sub ClearS$/;"	s
+CloseServer	socket.pl	/^sub CloseServer$/;"	s
+CmdError	client.pl	/^sub CmdError$/;"	s
+Config	config.pl	/^sub Config$/;"	s
+ConfigSignals	config.pl	/^sub ConfigSignals$/;"	s
+ConfigVars	config.pl	/^sub ConfigVars$/;"	s
+Connect	socket.pl	/^sub Connect$/;"	s
+Deal	client.pl	/^sub Deal$/;"	s
+DefendOffer	client.pl	/^sub DefendOffer$/;"	s
+Disconnect	socket.pl	/^sub Disconnect$/;"	s
+DownArrow	client.pl	/^sub DownArrow$/;"	s
+DropDeny	client.pl	/^sub DropDeny$/;"	s
+DropOffer	client.pl	/^sub DropOffer$/;"	s
+EndDeny	client.pl	/^sub EndDeny$/;"	s
+Exit	peuchrec	/^sub Exit$/;"	s
+GameOver	client.pl	/^sub GameOver$/;"	s
+GameStatus	screen.pl	/^sub GameStatus$/;"	s
+GetAnswer	screen.pl	/^sub GetAnswer$/;"	s
+GetChat	screen.pl	/^sub GetChat$/;"	s
+GetName	screen.pl	/^sub GetName$/;"	s
+GetOptions	screen.pl	/^sub GetOptions$/;"	s
+GetPlayer	screen.pl	/^sub GetPlayer$/;"	s
+GetPort	screen.pl	/^sub GetPort$/;"	s
+GetServer	screen.pl	/^sub GetServer$/;"	s
+GetString	screen.pl	/^sub GetString$/;"	s
+HandOver	client.pl	/^sub HandOver$/;"	s
+HiChoices	screen.pl	/^sub HiChoices$/;"	s
+JoinAccept	client.pl	/^sub JoinAccept$/;"	s
+JoinDeny	client.pl	/^sub JoinDeny$/;"	s
+Kick	client.pl	/^sub Kick$/;"	s
+KickDeny	client.pl	/^sub KickDeny$/;"	s
+LeftArrow	client.pl	/^sub LeftArrow$/;"	s
+MAKESCRIPTS	Makefile	/^MAKESCRIPTS=..\/makescripts$/;"	m
+OptionsDeny	client.pl	/^sub OptionsDeny$/;"	s
+OptionsString	screen.pl	/^sub OptionsString$/;"	s
+OrderDeny	client.pl	/^sub OrderDeny$/;"	s
+OrderOffer	client.pl	/^sub OrderOffer$/;"	s
+ParseArgs	config.pl	/^sub ParseArgs$/;"	s
+PlayDeny	client.pl	/^sub PlayDeny$/;"	s
+PlayGame	game.pl	/^sub PlayGame$/;"	s
+PlayOffer	client.pl	/^sub PlayOffer$/;"	s
+PlayerName	screen.pl	/^sub PlayerName$/;"	s
+PlayerString	screen.pl	/^sub PlayerString$/;"	s
+PrintPlayer	screen.pl	/^sub PrintPlayer$/;"	s
+ReadBoolean	socket.pl	/^sub ReadBoolean$/;"	s
+ReadCard	socket.pl	/^sub ReadCard$/;"	s
+ReadInt	socket.pl	/^sub ReadInt$/;"	s
+ReadPlayer	client.pl	/^sub ReadPlayer$/;"	s
+ReadShort	socket.pl	/^sub ReadShort$/;"	s
+ReadString	socket.pl	/^sub ReadString$/;"	s
+ReadSuit	socket.pl	/^sub ReadSuit$/;"	s
+RightArrow	client.pl	/^sub RightArrow$/;"	s
+Select	socket.pl	/^sub Select$/;"	s
+SendCall	message.pl	/^sub SendCall$/;"	s
+SendCallPass	message.pl	/^sub SendCallPass$/;"	s
+SendChat	message.pl	/^sub SendChat$/;"	s
+SendChoice	message.pl	/^sub SendChoice$/;"	s
+SendDefend	message.pl	/^sub SendDefend$/;"	s
+SendDrop	message.pl	/^sub SendDrop$/;"	s
+SendEnd	message.pl	/^sub SendEnd$/;"	s
+SendID	message.pl	/^sub SendID$/;"	s
+SendJoin	message.pl	/^sub SendJoin$/;"	s
+SendKick	message.pl	/^sub SendKick$/;"	s
+SendMessage	socket.pl	/^sub SendMessage$/;"	s
+SendOptions	message.pl	/^sub SendOptions$/;"	s
+SendOrder	message.pl	/^sub SendOrder$/;"	s
+SendPlay	message.pl	/^sub SendPlay$/;"	s
+SendQuit	message.pl	/^sub SendQuit$/;"	s
+SendStart	message.pl	/^sub SendStart$/;"	s
+ServerDecline	client.pl	/^sub ServerDecline$/;"	s
+ServerDie	game.pl	/^sub ServerDie$/;"	s
+ServerError	client.pl	/^sub ServerError$/;"	s
+ServerQuit	client.pl	/^sub ServerQuit$/;"	s
+ServiceS	client.pl	/^sub ServiceS$/;"	s
+ServiceSTDIN	client.pl	/^sub ServiceSTDIN$/;"	s
+SetCall	message.pl	/^sub SetCall$/;"	s
+SetTeams	game.pl	/^sub SetTeams$/;"	s
+ShowChat	screen.pl	/^sub ShowChat$/;"	s
+SignalCatcher	peuchrec	/^sub SignalCatcher$/;"	s
+StartDeny	client.pl	/^sub StartDeny$/;"	s
+State	client.pl	/^sub State$/;"	s
+SuitOf	screen.pl	/^sub SuitOf$/;"	s
+SuitToText	screen.pl	/^sub SuitToText$/;"	s
+TextToType	screen.pl	/^sub TextToType$/;"	s
+TrickOver	client.pl	/^sub TrickOver$/;"	s
+TrumpString	screen.pl	/^sub TrumpString$/;"	s
+UpArrow	client.pl	/^sub UpArrow$/;"	s
+UpdateScreen	screen.pl	/^sub UpdateScreen$/;"	s
+Usage	config.pl	/^sub Usage$/;"	s
+Winch	screen.pl	/^sub Winch$/;"	s
+fdisset	socket.pl	/^sub fdisset$/;"	s
+fdset	socket.pl	/^sub fdset$/;"	s
+hi	screen.pl	/^sub hi$/;"	s
+hilength	screen.pl	/^sub hilength$/;"	s
+noecho	config.pl	/^	sub noecho$/;"	s
+normal	config.pl	/^	sub normal$/;"	s
+raw	config.pl	/^	sub raw$/;"	s
+test	peuchrec	/^sub test$/;"	s

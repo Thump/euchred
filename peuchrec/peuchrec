@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+# PeuchreC : Perl Euchre Client
+#
+# (C) Copyright 1999 Denis McLaughlin
+
+
+###########################################################################
+# Some requires and miscellaneous other stuff
+
+print "
+PeuchreC: Perl Euchre Client
+version 0.9
+
+(C) Copyright 1999 Denis McLaughlin
+denism\@cyberus.ca\n\n";
+
+print "loading modules:\n";
+foreach $file ("config.pl","socket.pl","client.pl","screen.pl",
+	"message.pl","game.pl","../common/messages.pl")
+{	print "  $file\n";
+	require ($file);
+}
+
+
+###########################################################################
+# Some global variables
+
+$server="127.0.0.1";  # default server to connect to
+$port=1234;          # default port to connect to on the server
+
+# game variables
+$gh=0; # game handle: not really used with the current single-game server,
+       # but to simplify later development, I'm requiring it now
+$ph=0; # player handle: also not exactly needed right now, but also required
+
+
+###########################################################################
+# This is the client main line
+
+
+# configure the client, including parsing the command line
+Config();
+
+# play the damn game
+AddChat("Client: Welcome to PeuchreC!\n");
+PlayGame();
+
+# Final exit routine
+Exit();
+
+
+###########################################################################
+# A short routine, used for testing
+
+sub test
+{
+	AddChat("msglines is $msglines");
+	AddChat("msgcolumns is $msgcolumns");
+}
+
+
+###########################################################################
+# Short routine prior to exiting
+
+sub Exit
+{
+	AddChat("@_") if (@_);
+
+	CloseServer();
+	normal();
+	AddChat("Client: Peuchrec now exiting...");
+	print "\n\n";
+	exit;
+}
+
+
+###########################################################################
+# A dorky little signal catcher
+
+sub SignalCatcher
+{
+	print "\nCaught $_[0] signal, exiting...";
+	Exit();
+}
+
+
+###########################################################################
+1;

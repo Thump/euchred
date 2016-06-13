@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo `date` :: `find . -type f -exec cat \{\} \; | wc -c` `find . -print | wc -l` `find . -type f -exec cat \{\} \; | grep \; | wc -l`

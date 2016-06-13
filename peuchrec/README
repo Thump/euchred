@@ -1,0 +1,21 @@
+
+---------------------------------------------------------------------------
+General ------------------------------------------------------------------- 
+
+  This is Peuchrec, a command line client for the euchres euchre server.
+  It is written in Perl.  It is pronounced Puker-C.  If you don't like
+  it, write your own damn client: see ../euchres/Implementation to find
+  out how.
+
+  The purpose of this client is as an initial, test client, so there is
+  no long term caching of player name or anything.
+
+
+---------------------------------------------------------------------------
+Compiling ----------------------------------------------------------------- 
+
+  The client is written in standard perl: the only Perl 5-isms are in
+  the terminal stuff.  (See the BEGIN routine in config.pl.)
+
+  The client needs access to ../common/message.h, so moving it out of
+  the euchre-*/peuchrec directory would take some munging.

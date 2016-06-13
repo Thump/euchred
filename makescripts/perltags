@@ -1,0 +1,10 @@
+#!/bin/sh
+
+for file in peuchrec *.pl
+do
+  cat $file | grep '^sub' | while read line
+  do
+    name=`echo $line | sed -e 's/^sub[ 	]*\([^ 	]*\)[ 	]*.*/\1/'`
+    echo "$name	$file	/^${line}\$/;\"	f"
+  done
+done | sort
