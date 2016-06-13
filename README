@@ -3,8 +3,7 @@ General
 
   This is a software package for playing euchre: it currently contains
   a server (euchres) written in C, and a text-mode client (peuchrec)
-  written in Perl.  Hopefully, it will eventually also contain a variety
-  of X and console clients, as well as euchre bots.
+  written in Perl.
 
   This package is currently in alpha testing, so expect things to break.
   However, with some luck it can be used to play a complete game of
@@ -15,8 +14,8 @@ General
 
 
 Denis McLaughlin
-denism@cyberus.ca
-August 21, 1999
+mclaughlin.denis@gmail.com
+Jun 12, 2016
 
 ---------------------------------------------------------------------------
 
