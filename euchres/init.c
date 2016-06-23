@@ -111,7 +111,7 @@ void ReadConfig(void)
 	if (configF==NULL)
 	{
 		sprintf(tbuffer1,"Error opening config %s: %s",
-			config,sys_errlist[errno]);
+			config,strerror(errno));
 		myLog(tbuffer1);
 		return;
 	}

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <string.h>
 
 /* specific euchres includes */
 #include "euchres.h"
@@ -37,7 +38,7 @@ void OpenLog(void)
 	if ( logF == NULL)
 	{
 		sprintf(tbuffer1,"Error opening log file %s: %s",
-			logfile,sys_errlist[errno]);
+			logfile,strerror(errno));
 		myLog(tbuffer1);
 	}
 	else

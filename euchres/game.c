@@ -636,6 +636,7 @@ boolean NextPlay()
 
 		/* check the makers got 'em all */
 		if (hand.tricks[maketeam] == 5)
+        {
 			/* by going alone? */
 			if (players[hand.maker].alone)
 			{	sprintf(tbuffer1,
@@ -657,6 +658,7 @@ boolean NextPlay()
 				game.score[maketeam]+=2;
 				return(false);
 			}
+        }
 
 		/* check if the defenders stopped them  */
 		if (hand.tricks[maketeam]>2 && hand.tricks[defendteam]>0)
@@ -869,17 +871,21 @@ Card HiCard(Card card1, Card card2, int leadsuit, int trumpsuit)
 
 	/* If both cards are leadsuit, return the card with the higher value. */
 	if ( card1.suit == leadsuit && card2.suit == leadsuit )
+    {
 		if ( card1.value > card2.value )
 			return(card1);
 		else
 			return(card2);
+    }
  
 	/* If both cards are trump, reuturn the card with the higher value. */
 	if ( card1.suit == trumpsuit && card2.suit == trumpsuit )
+    {
 		if ( card1.value > card2.value )
 			return(card1);
 		else
 			return(card2);
+    }
 
 	/* If one card is trump and the other not, return the trump.  */
 	if ( card1.suit == trumpsuit && card2.suit != trumpsuit )

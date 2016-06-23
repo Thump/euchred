@@ -42,7 +42,7 @@ void OpenSocket(void)
 
 	if ( (s=socket(AF_INET,SOCK_STREAM,0)) == -1)
 	{
-		sprintf(tbuffer1,"Error creating socket: %s",sys_errlist[errno]);
+		sprintf(tbuffer1,"Error creating socket: %s",strerror(errno));
 		myLog(tbuffer1);
 		Exit();
 	}
@@ -50,14 +50,14 @@ void OpenSocket(void)
 	optval=1;
 	if ( setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(int *)&optval,sizeof(optval))<0)
 	{
-		sprintf(tbuffer1,"Error setting SO_REUSEADDR: %s",sys_errlist[errno]);
+		sprintf(tbuffer1,"Error setting SO_REUSEADDR: %s",strerror(errno));
 		myLog(tbuffer1);
 		Exit();
 	}
 
-	if (bind(s,&saddr,sizeof(saddr)) != 0)
+	if (bind(s,(const struct sockaddr *)&saddr,sizeof(saddr)) != 0)
 	{
-		sprintf(tbuffer1,"Error binding socket: %s",sys_errlist[errno]);
+		sprintf(tbuffer1,"Error binding socket: %s",strerror(errno));
 		myLog(tbuffer1);
 		Exit();
 	}
@@ -113,7 +113,7 @@ char *AcceptSocket(int *client)
 	debug(GENERAL) fprintf(stderr,"entering AcceptSocket()\n");
 
     size=sizeof(saddr);
-    *client=accept(s,&saddr,&size);
+    *client=accept(s,(struct sockaddr *)&saddr,(socklen_t *)&size);
 
 	ip=strdup(inet_ntoa(saddr.sin_addr));
 	lomem(ip);

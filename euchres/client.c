@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <sys/ioctl.h>
 
@@ -29,7 +30,7 @@
 /* Service inbound data request on client socket */
 void ServiceClient(int pnum)
 {
-	int request,len;
+	int request;
 
 	debug(GENERAL) fprintf(stderr,"entering ServiceClient()\n");
 
@@ -38,7 +39,7 @@ void ServiceClient(int pnum)
 		return;
 	
 	/* right, we've got all the data: read and parse the message ID */
-	len=ReadMsg(players[pnum].socket,(char *)&request,4);
+	ReadMsg(players[pnum].socket,(char *)&request,4);
 	request=UnpackInt(request);
 
 	switch ( request )

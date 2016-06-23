@@ -25,7 +25,7 @@
  *  - accept four clients
  *  - play the game
  */
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	debug(GENERAL) fprintf(stderr,"entering main()\n");
 
