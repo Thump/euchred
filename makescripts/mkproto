@@ -16,4 +16,4 @@ echo "
 
 "
 
-grep '^[^*#{}/ 	]' *.c | grep -v printf | sed -e 's/^.*://' -e 's/$/;/' | sort +1
+grep '^[^*#{}/ 	]' *.c | grep -v printf | sed -e 's/^.*://' -e 's/$/;/' | sort
