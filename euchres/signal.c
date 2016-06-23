@@ -33,7 +33,7 @@ void TrapHUP(void)
 {
 	debug(GENERAL) fprintf(stderr,"entering TrapHUP()\n");
 
-	log("Whoops, caught SIGHUP, exiting...");
+	myLog("Whoops, caught SIGHUP, exiting...");
 	Exit();
 }
 
@@ -43,6 +43,6 @@ void TrapINT(void)
 {
 	debug(GENERAL) fprintf(stderr,"entering TrapINT()\n");
 
-	log("Whoops, caught SIGINT, exiting...");
+	myLog("Whoops, caught SIGINT, exiting...");
 	Exit();
 }

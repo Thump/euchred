@@ -76,16 +76,16 @@ void Exit(void)
 		if (players[pnum].socket != undefined)
 		{	sprintf(tbuffer1,"Notifying client %d (%s)",
 				pnum,players[pnum].playername);
-			log(tbuffer1);
+			myLog(tbuffer1);
 			SendQuit(pnum,"Sorry, server is exiting");
 			close(players[pnum].socket);
 		}
 
 	/* shut down the server socket */
-	log("Stopping euchre server...");
+	myLog("Stopping euchre server...");
 	close(s);
 
-	log("Exiting...");
+	myLog("Exiting...");
 	if ( logF != NULL) fclose(logF);
 
 	exit(0);

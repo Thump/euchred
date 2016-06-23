@@ -39,7 +39,7 @@ void Initialize(int argc, char **argv)
 	/* Open the log file */
 	OpenLog();
 
-	log("Starting euchre server");
+	myLog("Starting euchre server");
 
 	/* initialize game and player structures */
 	InitData();
@@ -112,7 +112,7 @@ void ReadConfig(void)
 	{
 		sprintf(tbuffer1,"Error opening config %s: %s",
 			config,sys_errlist[errno]);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -164,7 +164,7 @@ void ReadConfig(void)
 		
 		sprintf(tbuffer1,"unknown syntax error in %s at line %d: ignored"
 			,config,linecount);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* close our config file */

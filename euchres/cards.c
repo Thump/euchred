@@ -64,7 +64,7 @@ void AddCard(int pnum, Card card)
 	if (players[pnum].numcards > 4)
 	{	sprintf(tbuffer1,"Tried to add a sixth card to %s (%d)",
 			players[pnum].playername,players[pnum].numcards);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -90,7 +90,7 @@ void RemoveCard(int pnum, Card card)
 	if ( !HasCard(pnum,card) )
 	{	sprintf(tbuffer1,"Tried to remove a nonexistent card from %s",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 

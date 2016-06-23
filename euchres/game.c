@@ -425,7 +425,7 @@ boolean NextOrder()
 
 	/* bad things: if current is still -1, we don't have a dealer */
 	if (current == -1)
-	{	log("Can't find dealer in NextOrder()");
+	{	myLog("Can't find dealer in NextOrder()");
 		return(false);
 	}
 
@@ -480,7 +480,7 @@ boolean NextCall()
 
 	/* bad things: if current is still -1, we don't have a dealer */
 	if (current == -1)
-	{	log("Can't find dealer in NextCall()");
+	{	myLog("Can't find dealer in NextCall()");
 		return(false);
 	}
 
@@ -490,7 +490,7 @@ boolean NextCall()
 	 */
 	if (players[current].dealer)
 	{	if (hand.suit == -1)
-		{	log("Dealer escaped a screwing: badness");
+		{	myLog("Dealer escaped a screwing: badness");
 			hand.suit=2; /* rando state */
 		}
 		else
@@ -737,7 +737,7 @@ boolean NextPlay()
 		return(true);
 	}
 
-	log("Bad fall through in NextPlay(): Help me Tito!");
+	myLog("Bad fall through in NextPlay(): Help me Tito!");
 	return(true);
 }
 
@@ -757,7 +757,7 @@ boolean ValidPlay(int pnum, Card card)
 				leader=i;
 
 	if (leader==-1)
-	{	log("Can't find leader in ValidPlay()");
+	{	myLog("Can't find leader in ValidPlay()");
 		Exit();
 	}
 
@@ -806,7 +806,7 @@ void EvaluateCards()
 	trumpsuit=hand.suit;
 
 	if (leadsuit==-1)
-	{	log("Shitfuck, can't find leadsuit in EvaluateCards()");
+	{	myLog("Shitfuck, can't find leadsuit in EvaluateCards()");
 		leadsuit=2;
 	}
 
@@ -823,7 +823,7 @@ void EvaluateCards()
 			players[i].card.value == winningcard.value)
 			winner=i;
 	if (winner == -1)
-	{	log("Shitfuck, can't find winning card");
+	{	myLog("Shitfuck, can't find winning card");
 		Exit();
 	}
 

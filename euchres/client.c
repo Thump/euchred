@@ -170,7 +170,7 @@ boolean MsgReady(int pnum)
 		{	sprintf(tbuffer1,
 				"Short message from %d (%s): expecting %d, got %d",
 				pnum,players[pnum].playername,msglen,available);
-			log(tbuffer1);
+			myLog(tbuffer1);
 			players[pnum].msgwait=true;
 			players[pnum].msgtime=time(NULL);
 			players[pnum].msglen=msglen;
@@ -239,7 +239,7 @@ void AddClient()
 	 */
 	if (i == 4)
 	{
-		log("Bad AddClient, run your might and tell Denis");
+		myLog("Bad AddClient, run your might and tell Denis");
 		close(client);
 		return;
 	}
@@ -265,7 +265,7 @@ void AddClient()
 		sprintf(tbuffer1,"Client %d (%s) added",i,players[i].ip);
 	}
 
-	log(tbuffer1);
+	myLog(tbuffer1);
 } 
 
 
@@ -284,7 +284,7 @@ void KickClient(int pnum, char *reason)
 
 	/* log our action */
 	sprintf(tbuffer1,"Client %d (%s) kicked: %s",pnum,name,reason);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* send the message to the client */
 	SendKick(pnum,reason);
@@ -314,7 +314,7 @@ void DeclineClient()
 	SendDecline(client,"Sorry big guy, game's full...\n");
 	
 	sprintf(tbuffer1,"Client from %s declined: game is full",ip);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	free(ip);
 	close(client);
@@ -332,7 +332,7 @@ void JoinClient(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering JoinClient()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): JOIN",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <JOIN> <protocol> <string> <tail> */
 	if ( ! ReadInt(pnum,&cprotocol) ) return;
@@ -344,7 +344,7 @@ void JoinClient(int pnum)
 	{
 		sprintf(tbuffer1,"Duplicate JOIN: client %d, protocol %d: ignoring",
 			pnum,cprotocol);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -355,7 +355,7 @@ void JoinClient(int pnum)
 		SendJoinDeny(pnum,tbuffer1);
 		sprintf(tbuffer1,"Client %d joined with unsupported protocol: %d",
 			pnum,cprotocol);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		RemoveClient(pnum);
 		return;
 	}
@@ -380,7 +380,7 @@ void JoinClient(int pnum)
 	/* and log some information */
 	sprintf(tbuffer1,"Client %d (%s) joined (protocol version %d)",
 		pnum,players[pnum].playername,cprotocol);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* and send the join accept as well as a chat message to all players */
 	SendJoinAccept(pnum);
@@ -425,7 +425,7 @@ void RemoveClient(int pnum)
 		PickCreator();
 	}
 
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* if there are no players left, reset the game and clear the players */
 	if (game.players == 0)
@@ -435,7 +435,7 @@ void RemoveClient(int pnum)
 		ClearPlayer(1);
 		ClearPlayer(2);
 		ClearPlayer(3);
-		log("No players left: resetting game");
+		myLog("No players left: resetting game");
 	}
 }
 
@@ -447,7 +447,7 @@ void ClientDisconnect(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientDisconnect()\n");
 
 	sprintf(tbuffer1,"client %d unexpectedly disconnected",pnum);
-	log(tbuffer1);
+	myLog(tbuffer1);
 	name=strdup(players[pnum].playername);
 	lomem(name);
 
@@ -470,7 +470,7 @@ void ClientQuit(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientQuit()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): QUIT",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <CLIENTQUIT> <gh> <ph> <string> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -482,11 +482,11 @@ void ClientQuit(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	sprintf(tbuffer1,"client %d has quit, saying: \"%s\"",pnum,reason);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	sprintf(tbuffer2,"Server: %s has quit, saying: \"%s\".",
 		players[pnum].playername,reason);
@@ -507,7 +507,7 @@ void ClientID(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ID()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): ID",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
     /* <msg> : <ID> <gameh> <playerh> <data> <tail>
      *   <data> : <nmstring> <clstring> <hwstring> <osstring> <cmtstring>
@@ -526,7 +526,7 @@ void ClientID(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* process player name */
@@ -563,7 +563,7 @@ void ClientID(int pnum)
 
 	sprintf(tbuffer1,"Received ID from client %d: %s",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* send state message with updated info to players */
 	SendState();
@@ -579,7 +579,7 @@ void ClientChat(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientChat()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): CHAT",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <CHAT> <gameh> <playerh> <string> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -591,11 +591,11 @@ void ClientChat(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	sprintf(tbuffer1,"received chat from client %d: \"%s\"",pnum,chat);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	sprintf(tbuffer1,"%s: %s",players[pnum].playername,chat);
 	SendChat(tbuffer1);
@@ -618,7 +618,7 @@ boolean TailCheck(int pnum)
 	if (tmp != TAIL)
     {	printf(tbuffer1,"Bad tail from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Bad tail");
 		return(false);
 	}
@@ -636,7 +636,7 @@ void ClientGarbage(int pnum)
 
 	sprintf(tbuffer1,"Received garbage from %d (%s)",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	KickClient(pnum,"Garbage in, garbage out, okay?");
 }
@@ -654,7 +654,7 @@ void ClientKick(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): CLIENTKICK",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <CLIENTKICK> <gh> <ph> <targetph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -666,7 +666,7 @@ void ClientKick(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that they're not kicking themselves */
@@ -674,7 +674,7 @@ void ClientKick(int pnum)
 	{	SendKickDeny(pnum,"Can't kick yourself.");
 		sprintf(tbuffer1,"Player %s tried to self-kick",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -683,7 +683,7 @@ void ClientKick(int pnum)
 	{	SendKickDeny(pnum,"Must be creator to kick users.");
 		sprintf(tbuffer1,"Player %s tried to kick without being creator",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -691,7 +691,7 @@ void ClientKick(int pnum)
 	sprintf(tbuffer3,"Player %s kicked by request of %s",
 		players[targetph].playername,players[pnum].playername);
 	KickClient(targetph,"creator request");
-	log(tbuffer3);
+	myLog(tbuffer3);
 }
 
 
@@ -707,7 +707,7 @@ void ClientOptions(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): OPTIONS",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <msglen> <OPTIONS> <gh> <ph> <candefend>
 	 *         <aloneonorder> <screw> <tail>
@@ -723,7 +723,7 @@ void ClientOptions(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that they have creator status */
@@ -731,7 +731,7 @@ void ClientOptions(int pnum)
 	{	SendOptionsDeny(pnum,"Must be creator to set options.");
 		sprintf(tbuffer1,"Player %s tried to set options without being creator",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -740,7 +740,7 @@ void ClientOptions(int pnum)
 	{	SendOptionsDeny(pnum,"Can't change options after game start.");
 		sprintf(tbuffer1,"Player %s tried to set options after game start",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -751,7 +751,7 @@ void ClientOptions(int pnum)
 
 	SendState();
 	sprintf(tbuffer3,"Options set by %s",players[pnum].playername);
-	log(tbuffer3);
+	myLog(tbuffer3);
 }
 
 
@@ -763,7 +763,7 @@ void ClientStart(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): START",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <START> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -774,7 +774,7 @@ void ClientStart(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that they have creator status */
@@ -782,7 +782,7 @@ void ClientStart(int pnum)
 	{	SendStartDeny(pnum,"Must be creator to start game.");
 		sprintf(tbuffer1,"Player %s tried to start game without being creator",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -791,7 +791,7 @@ void ClientStart(int pnum)
 	{	SendStartDeny(pnum,"Game already started.");
 		sprintf(tbuffer1,"Player %s tried to restart game",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -800,7 +800,7 @@ void ClientStart(int pnum)
 	{	SendStartDeny(pnum,"Need four players to start game.");
 		sprintf(tbuffer1,"Player %s tried to prestart game",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -824,7 +824,7 @@ void ClientEnd(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientEnd()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): END",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <END> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -835,7 +835,7 @@ void ClientEnd(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that they have creator status */
@@ -843,7 +843,7 @@ void ClientEnd(int pnum)
 	{	SendEndDeny(pnum,"Must be creator to end game.");
 		sprintf(tbuffer1,"Player %s tried to end game without being creator",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -867,7 +867,7 @@ void ClientOrder(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientOrder()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): ORDER",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <ORDER> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -878,7 +878,7 @@ void ClientOrder(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -886,7 +886,7 @@ void ClientOrder(int pnum)
 	{	SendOrderDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-order",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -895,7 +895,7 @@ void ClientOrder(int pnum)
 	{	SendOrderDeny(pnum,"Order not offered.");
 		sprintf(tbuffer1,"Player %s tried to order without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -948,7 +948,7 @@ void ClientOrderAlone(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): ORDERALONE",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <ORDERALONE> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -959,7 +959,7 @@ void ClientOrderAlone(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -967,7 +967,7 @@ void ClientOrderAlone(int pnum)
 	{	SendOrderDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-order",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -976,7 +976,7 @@ void ClientOrderAlone(int pnum)
 	{	SendOrderDeny(pnum,"Order not offered.");
 		sprintf(tbuffer1,"Player %s tried to order without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1023,7 +1023,7 @@ void ClientOrderPass(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): ORDERPASS",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <ORDERPASS> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1034,7 +1034,7 @@ void ClientOrderPass(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1042,7 +1042,7 @@ void ClientOrderPass(int pnum)
 	{	SendOrderDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-order",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1051,7 +1051,7 @@ void ClientOrderPass(int pnum)
 	{	SendOrderDeny(pnum,"Order not offered.");
 		sprintf(tbuffer1,"Player %s tried to order without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1073,7 +1073,7 @@ void ClientDrop(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientDrop()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): DROP",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <DROP> <gh> <ph> <card.value> <card.suit> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1086,7 +1086,7 @@ void ClientDrop(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1094,7 +1094,7 @@ void ClientDrop(int pnum)
 	{	SendDropDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-drop",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1103,7 +1103,7 @@ void ClientDrop(int pnum)
 	{	SendDropDeny(pnum,"Drop not offered.");
 		sprintf(tbuffer1,"Player %s tried to drop without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1112,7 +1112,7 @@ void ClientDrop(int pnum)
 	{	SendDropDeny(pnum,"Can't drop nonexistent card.");
 		sprintf(tbuffer1,"Player %s tried to drop nonexistent card",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1138,7 +1138,7 @@ void ClientCall(int pnum)
 	debug(GENERAL) fprintf(stderr,"entering ClientCall()\n");
 
 	sprintf(tbuffer1,"Servicing %d (%s): CALL",pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <ORDER> <gh> <ph> <card.suit> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1150,7 +1150,7 @@ void ClientCall(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1158,7 +1158,7 @@ void ClientCall(int pnum)
 	{	SendCallDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-call",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1167,7 +1167,7 @@ void ClientCall(int pnum)
 	{	SendCallDeny(pnum,"Call not offered.");
 		sprintf(tbuffer1,"Player %s tried to call without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1176,7 +1176,7 @@ void ClientCall(int pnum)
 	{	SendCallDeny(pnum,"Can't call declined suit.");
 		sprintf(tbuffer1,"Player %s tried to call declined suit",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1208,7 +1208,7 @@ void ClientCallAlone(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): CALLALONE",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <CALLALONE> <gh> <ph> <suit> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1220,7 +1220,7 @@ void ClientCallAlone(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1228,7 +1228,7 @@ void ClientCallAlone(int pnum)
 	{	SendCallDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-call",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1237,7 +1237,7 @@ void ClientCallAlone(int pnum)
 	{	SendCallDeny(pnum,"Call not offered.");
 		sprintf(tbuffer1,"Player %s tried to call without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1271,7 +1271,7 @@ void ClientCallPass(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): CALLPASS",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <CALLPASS> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1282,7 +1282,7 @@ void ClientCallPass(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1290,7 +1290,7 @@ void ClientCallPass(int pnum)
 	{	SendCallDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-call",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1299,7 +1299,7 @@ void ClientCallPass(int pnum)
 	{	SendCallDeny(pnum,"Call not offered.");
 		sprintf(tbuffer1,"Player %s tried to pass on call without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1309,7 +1309,7 @@ void ClientCallPass(int pnum)
 		{	SendCallDeny(pnum,"Screw the dealer in effect: must choose suit.");
 			sprintf(tbuffer1,"Dealer %s tried to pass against screw the dealer",
 				players[pnum].playername);
-			log(tbuffer1);
+			myLog(tbuffer1);
 			return;
 		}
 		else
@@ -1318,7 +1318,7 @@ void ClientCallPass(int pnum)
 			SendChat(tbuffer1);
 			sprintf(tbuffer1,"%s has folded the hand",
 				players[pnum].playername);
-			log(tbuffer1);
+			myLog(tbuffer1);
 			ClearHand();
 			NewHand();
 			NextAction();
@@ -1345,7 +1345,7 @@ void ClientDefend(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): DEFEND",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <DEFEND> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1356,7 +1356,7 @@ void ClientDefend(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1364,7 +1364,7 @@ void ClientDefend(int pnum)
 	{	SendDefendDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-defend",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1373,7 +1373,7 @@ void ClientDefend(int pnum)
 	{	SendDefendDeny(pnum,"Defend not offered.");
 		sprintf(tbuffer1,"Player %s tried to defend without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1399,7 +1399,7 @@ void ClientDefendPass(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): DEFENDPASS",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <DEFENDPASS> <gh> <ph> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1410,7 +1410,7 @@ void ClientDefendPass(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1418,7 +1418,7 @@ void ClientDefendPass(int pnum)
 	{	SendDefendDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-defend",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1427,7 +1427,7 @@ void ClientDefendPass(int pnum)
 	{	SendDefendDeny(pnum,"Defend not offered.");
 		sprintf(tbuffer1,"Player %s tried to pass on defending without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1450,7 +1450,7 @@ void ClientPlay(int pnum)
 
 	sprintf(tbuffer1,"Servicing %d (%s): PLAY",
 		pnum,players[pnum].playername);
-	log(tbuffer1);
+	myLog(tbuffer1);
 
 	/* <msg> : <PLAY> <gh> <ph> <value> <suit> <tail> */
 	if ( ! ReadInt(pnum,&gh) ) return;
@@ -1463,7 +1463,7 @@ void ClientPlay(int pnum)
 	if (ph != pnum)
 	{	sprintf(tbuffer1,"mismatch player handle: from %d, claims %d",
 			pnum,ph);
-		log(tbuffer1);
+		myLog(tbuffer1);
 	}
 
 	/* Check that the game has already started */
@@ -1471,7 +1471,7 @@ void ClientPlay(int pnum)
 	{	SendDefendDeny(pnum,"Game not yet started.");
 		sprintf(tbuffer1,"Player %s tried to pre-defend",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1480,7 +1480,7 @@ void ClientPlay(int pnum)
 	{	SendPlayDeny(pnum,"Play not offered.");
 		sprintf(tbuffer1,"Player %s tried to play without offer",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1489,7 +1489,7 @@ void ClientPlay(int pnum)
 	{	SendPlayDeny(pnum,"You don't possess that card.");
 		sprintf(tbuffer1,"Player %s tried to play unowned card",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 
@@ -1498,7 +1498,7 @@ void ClientPlay(int pnum)
 	{	SendPlayDeny(pnum,"Must follow suit.");
 		sprintf(tbuffer1,"Player %s tried to play invalid card",
 			players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		return;
 	}
 

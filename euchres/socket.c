@@ -43,7 +43,7 @@ void OpenSocket(void)
 	if ( (s=socket(AF_INET,SOCK_STREAM,0)) == -1)
 	{
 		sprintf(tbuffer1,"Error creating socket: %s",sys_errlist[errno]);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		Exit();
 	}
 
@@ -51,14 +51,14 @@ void OpenSocket(void)
 	if ( setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(int *)&optval,sizeof(optval))<0)
 	{
 		sprintf(tbuffer1,"Error setting SO_REUSEADDR: %s",sys_errlist[errno]);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		Exit();
 	}
 
 	if (bind(s,&saddr,sizeof(saddr)) != 0)
 	{
 		sprintf(tbuffer1,"Error binding socket: %s",sys_errlist[errno]);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		Exit();
 	}
 
@@ -187,7 +187,7 @@ char *ReadString(int pnum)
 	if ( ! ReadInt(pnum,&len) )
 	{	sprintf(tbuffer1,"Short string header from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Short message");
 		return(NULL);
 	}
@@ -195,7 +195,7 @@ char *ReadString(int pnum)
 	if (len > maxmsglen)
 	{	sprintf(tbuffer1,"Oversized string (%d) from %d (%s)",
 			len,pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Oversized message");
 		return(NULL);
 	}
@@ -203,7 +203,7 @@ char *ReadString(int pnum)
 	if ( ! BytesReady(players[pnum].socket,len) )
 	{	sprintf(tbuffer1,"Short string from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Short message");
 		return(NULL);
 	}
@@ -232,7 +232,7 @@ boolean ReadInt(int pnum, int *data)
 	if ( ! IntReady(players[pnum].socket) )
 	{	sprintf(tbuffer1,"Short integer from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Short message");
 		return false;
 	}
@@ -259,7 +259,7 @@ boolean ReadShort(int pnum, short *data)
 	if ( ! ShortReady(players[pnum].socket) )
 	{	sprintf(tbuffer1,"Missing tail from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Missing tail");
 		return false;
 	}
@@ -286,7 +286,7 @@ boolean ReadBoolean(int pnum, boolean *data)
 	if ( ! BooleanReady(players[pnum].socket) )
 	{	sprintf(tbuffer1,"Short boolean from %d (%s)",
 			pnum,players[pnum].playername);
-		log(tbuffer1);
+		myLog(tbuffer1);
 		KickClient(pnum,"Short message");
 		return false;
 	}
