@@ -14,14 +14,7 @@
 
 
 /* header string */
-char *header="
-Euchre Server
-version "VERSION"
-compiled "__DATE__" at "__TIME__"
-
-(C) Copyright 1999 Denis McLaughlin
-denism@cyberus.ca
-";
+char *header="Euchre Server\nversion "VERSION" \ncompiled "__DATE__" at "__TIME__" \n \n(C) Copyright 1999 Denis McLaughlin \nmclaughlin.denis@gmail.com\n";
 
 /* base directory name, only really used for informational purposes */
 char *base=BASE;
