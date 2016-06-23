@@ -25,3 +25,4 @@ clean:
 
 distclean:
 	( cd euchres ; make distclean )
+	rm -f euchres.log
