@@ -466,8 +466,8 @@ sub State
 	#   <score> : <team0> <team1>
 	#     <team0> : # score of team 0
 	#     <team1> : # score of team 1
-	#   <options> : <alone> <defend> <aloneonorder> <screw>
-	#     <alone>|<defend>|<aloneonorder>|<screw> : <boolean>
+	#   <options> : <defend> <aloneonorder> <screw>
+	#     <defend>|<aloneonorder>|<screw> : <boolean>
 
 	$game{ingame}=ReadBoolean();
 	$game{hstate}=ReadInt();

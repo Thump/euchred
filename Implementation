@@ -338,9 +338,9 @@ Client to Server Messages -------------------------------------------------
     if the client interface doesn't enforce this, the server will. 
     Options can be set before the game, but not during.
 
-      <msg> : <msglen> <OPTIONS> <gh> <ph> <candefendalone>
+      <msg> : <msglen> <OPTIONS> <gh> <ph>
               <aloneonorder> <screw> <tail>
-        <candefendalone>|<aloneonorder>|<screw> : <boolean>
+        <aloneonorder>|<screw> : <boolean>
 
     The server can accept these options, in which case no reply is sent
     (no explicit reply: after the options message is accepted, a state
@@ -514,14 +514,17 @@ Server to Client Messages -------------------------------------------------
               <pdata> : if <pstate> == joined
                           <ph> <nmstring> <clstring> <hwstring> <osstring>
                           <cmtstring> <team> <numcards> <creator> <ordered>
-                          <lead> <maker> <alone> <defend> <deal> <offer>
-                          <passed>
+                          <dealer> <alone> <defend> <leader> <maker>
+                          <playoffer> <orderoffer> <dropoffer> <calloffer>
+                          <defendoffer> <cardinplay> [<card>] <passed>
                         else
                           <NULL>
                 <NULL> :  # no data
                 <team> : {-1|0|1} # no team, team 0, or team 1
-                <creator>|<ordered>|<dealer>|<alone>|<defend>|<lead>|<maker>
-                <playoffer>|<orderoffer>|<calloffer>|<defendoffer> : <boolean>
+                <creator>|<ordered>|<dealer>|<alone>|<defend>|<leader>|<maker>
+                <playoffer>|<orderoffer>|<dropoffer>|<calloffer>|<defendoffer>
+                <cardinplay> <passed>
+                       : <boolean>
           <gamedata> : <ingame> <suspend> <holein> <hole> <trumpset> <trump>
                        <tricks> <score> <options>
             <ingame> : <boolean>
@@ -540,8 +543,8 @@ Server to Client Messages -------------------------------------------------
             <score> : <team0> <team1>
               <team0> : # score of team 0
               <team1> : # score of team 1
-            <options> : <alone> <defend> <aloneonorder> <screw>
-              <alone>|<defend>|<aloneonorder>|<screw> : <boolean>
+            <options> : <defend> <aloneonorder> <screw>
+              <defend>|<aloneonorder>|<screw> : <boolean>
           <cards> : <numcards> <card1> .. <cardN>
             <cardN> : <value> <suit>
 
