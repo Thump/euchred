@@ -14,8 +14,8 @@
 #include <time.h>
 #include <string.h>
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This routine opens the log file, setting logF to the file is the open

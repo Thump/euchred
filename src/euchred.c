@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 #include "global.h"
 
 
@@ -50,7 +50,7 @@ void Usage(void)
 	fprintf(stderr,"\n");
 	fprintf(stderr,"Usage: ");
 	fprintf(stderr,
-	"euchres [-h] [-d {0|1}] [-v <vl>] [-p <port>] [-F <file>] [-L <file>]\n");
+	"euchred [-h] [-d {0|1}] [-v <vl>] [-p <port>] [-F <file>] [-L <file>]\n");
 	fprintf(stderr,"\t-h        : prints this usage string\n");
 	fprintf(stderr,"\t-d {0|1}  : enables (1) or disables (0) debug\n");
 	fprintf(stderr,"\t-v <vl>   : sets the verbosity level\n");

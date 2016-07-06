@@ -12,10 +12,10 @@
 BASE=.
 
 # default configuration file
-CONFIG=$(BASE)/euchres.ini
+CONFIG=$(BASE)/euchred.ini
 
 # default log file
-LOGFILE=$(BASE)/euchres.log
+LOGFILE=$(BASE)/euchred.log
 
 # default listen port
 PORT=1234
@@ -54,11 +54,11 @@ MAKESCRIPTS=../makescripts
 
 ###########################################################################
 
-BIN=euchres
+BIN=euchred
 
 SRC=client.c \
     cards.c \
-    euchres.c \
+    euchred.c \
     game.c \
     init.c \
     log.c \
@@ -70,7 +70,7 @@ SRC=client.c \
 
 OBJ=client.o \
 	cards.o \
-	euchres.o \
+	euchred.o \
     game.o \
     init.o \
     log.o \
@@ -80,7 +80,7 @@ OBJ=client.o \
     signal.o \
     socket.o \
 
-AUX=$(CTAGSFILE) $(CTAGSFILE).vim euchres.log
+AUX=$(CTAGSFILE) $(CTAGSFILE).vim euchred.log
 
 CLEAN=$(OBJ) $(AUX) core
 REALCLEAN=$(CLEAN) $(BIN)

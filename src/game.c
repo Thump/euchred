@@ -15,8 +15,8 @@
 #include <string.h>
 
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This routine starts listening on a socket, and then calls the

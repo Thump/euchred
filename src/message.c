@@ -24,8 +24,8 @@
 #include <arpa/inet.h>
 
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* A short routine to send a decline message to a client who connects

@@ -13,8 +13,8 @@
 #include <sys/types.h>
 #include <signal.h>
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This routine sets the signal handlers */

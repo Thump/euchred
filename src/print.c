@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* Prints a miscellaneous header */

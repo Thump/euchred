@@ -19,8 +19,8 @@
 #include <netinet/in.h>
 
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This routine takes a pointer to a buffer and an integer, converts

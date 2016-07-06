@@ -23,8 +23,8 @@
 #include <sys/ioctl.h>
 
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This routine prepares, opens, binds and listens on the server socket */

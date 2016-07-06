@@ -14,8 +14,8 @@
 #include <errno.h>
 #include <time.h>
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 
 /* This is a wrapper function: it calls ReadSwitch() and ReadConfig(),

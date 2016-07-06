@@ -2,8 +2,8 @@
 General
 
   This is a software package for playing euchre: it currently contains
-  a server (euchres) written in C, and a text-mode client (peuchrec)
-  written in Perl.
+  a server (euchred) written in C.  It used to also contain a text mode
+  perl client, but that's been moved to a different github repo.
 
   This package is currently in alpha testing, so expect things to break.
   However, with some luck it can be used to play a complete game of
@@ -23,7 +23,7 @@ Requirements
 
   Server
     This package has been written on Linux, and it runs pretty ok there.
-    It should be easy to compile euchres on any Unix system, so long as
+    It should be easy to compile euchred on any Unix system, so long as
     the GNU tools or some equivalent is available.  It doesn't use a
     priviledged port by default, so normal users can compile and run it.
 
@@ -39,52 +39,27 @@ Making It
 
   Just type in make from the top level directory (the one containing
   this file): this should compile the server, leaving the resulting
-  executable in the euchres/ subdirectory.  If something falls off
+  executable in the src/ subdirectory.  If something falls off
   during the compile then, uhm, try and fix it.  Or at least let me know
   what happened by sending me mail.
-
-  Currently the only client is written in Perl, and so doesn't need
-  to be compiled.  You'll find the peuchrec client executable in the
-  peuchrec directory.
 
 ---------------------------------------------------------------------------
 
 Installing It
 
   We're still in alpha testing, so there is no installer yet.  The
-  client and server both assume they will be run from their respecting
-  peuchrec/ and euchres/ directories.
+  server assumes it will be run from its src/ directory.
 
 ---------------------------------------------------------------------------
 
 Running It
 
-  In one screen:
-    - cd euchres/
-    - ./euchres
+  To run the server:
+    - cd src/
+    - ./euchred
   The defaults have verbose logging turned on, so you'll see heaps of
   log messages.
   
-  In another screen
-    - cd peuchrec
-    - ./peuchrec
-
-  Peuchrec is single player client, so to actually have a game of euchre
-  you'll either have to run four clients and try not to cheat, or find
-  three friends who also have the client.
-
-  If you're running the clients and server on the same system, the
-  client's default server setting is fine.  Otherwise reset the server
-  by running ./peuchrec -s <servername>, or using the 's' command in the
-  client to reset the server name.
-
-  Once you've started the client, there is a state-sensitive help menu.
-  In brief, 'c' to connect, and once four players have joined (you'll
-  see them in the display), 's' to start the game.  Up and down arrows
-  scroll the chat messages forward and backward (space to zip to the
-  bottom), left and right arrow highlight options (when available),
-  return selects the current highlighted option.
-
 ---------------------------------------------------------------------------
 
 Implementation Details

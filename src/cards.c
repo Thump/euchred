@@ -13,8 +13,8 @@
 #include <sys/types.h>
 
 
-/* specific euchres includes */
-#include "euchres.h"
+/* specific euchred includes */
+#include "euchred.h"
 
 /* This routine returns a new shuffled deck of cards, that is, a 24 element
  * array of Card

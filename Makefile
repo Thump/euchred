@@ -6,23 +6,18 @@
 #
 ###########################################################################
 
-SERVER=euchres/euchres
-
-CLIENT=peuchrec/peuchrec
+SERVER=src/euchred
 
 ###########################################################################
 
-all : $(SERVER) $(CLIENT)
+all : $(SERVER)
 
-$(SERVER): euchres/*.h euchres/*.c common/*.h
-	( cd euchres ; make )
-
-$(CLIENT): common/*.pl
-	( cd peuchrec ; make )
+$(SERVER): src/*.h src/*.c common/*.h
+	( cd src ; make )
 
 clean:
-	( cd euchres ; make clean )
+	( cd src ; make clean )
 
 distclean:
-	( cd euchres ; make distclean )
-	rm -f euchres.log
+	( cd src ; make distclean )
+	rm -f euchred.log

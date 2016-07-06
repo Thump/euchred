@@ -9,7 +9,7 @@
 
 /* This is the place to define all global variables: this file is only
  * included by euchre.c.  For any variable added to this file, a corresponding
- * extern reference should exist in euchres.h
+ * extern reference should exist in euchred.h
  */
 
 
