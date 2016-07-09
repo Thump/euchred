@@ -519,29 +519,40 @@ boolean NextDefend()
 
 	debug(GENERAL) fprintf(stderr,"entering NextDefend()\n");
 
-	/* find out if we already have an offer, and unset it if we do */
-	current=-1;
+	/* Default current to be the player after the maker, then check if
+     * if we have a defend offer out.  If we do, set current to be the
+     * player after the player with the defend offer.  This algorithm
+     * will advance the defend offer through the list of players.
+	 */
+	current=(hand.maker+1)%4;
 	for (i=0; i<4; i++)
 		if (players[i].defendoffer)
-		{	current=i;
+		{
 			players[i].defendoffer=false;
+            current=(i+1)%4;
 		}
 
-	/* If we have no current offers, offer to first player after the
-	 * dealer who meets the criteria of being after the caller.  If
-	 * we do have an offer outm offer it to the next one in line.
-	 */
-	if (current == -1)
-		current=(hand.maker+1)%4;
-	else
-		current=(current+1)%4;
-
-	for (i=current; i!=(hand.dealer+1)%4; i=(i+1)%4)
-		if (players[i%4].team != players[hand.maker].team)
-		{	players[i%4].defendoffer=true;
-			SendDefendOffer((i+1)%4);
+    /* From the current player (either the player after the maker or the
+    * player after the current defendoffer target), step forward until we
+    * find a player who is not on the maker's team and send that player a
+    * defend offer.  If we get back around to the maker, then stop the
+    * cycle, since we'll have sent the defend offer to everyone who needs
+    * it.
+    */
+	for (i=current; i!=hand.maker; i=(i+1)%4)
+    {
+        sprintf(tbuffer1,"looking at %d", i);
+        myLog(tbuffer1);
+            
+		if (players[i].team != players[hand.maker].team)
+		{	players[i].defendoffer=true;
+            sprintf(tbuffer1,"sending DEFENDOFFER to %s (%d)",
+                players[i].playername,i);
+            myLog(tbuffer1);
+			SendDefendOffer(i);
 			return(true);
 		}
+    }
 
 	/* we only get here if the defend has been offered to everyone,
 	 * in which case we move to the next state, beginning play
@@ -591,7 +602,7 @@ boolean NextPlay()
 	 * the person after the leader is either defending or alone, or if it
 	 * is to the person after the leader, and both the leader and the person
 	 * after the leader are either going alone or defending alone, then
-	 * then the trick is over: evaluate it, reset the trick, recompute the
+	 * the trick is over: evaluate it, reset the trick, recompute the
 	 * leader, offer to the leader, and return
 	 *
 	 * Would you like parmesan cheese or ground pepper with that?
