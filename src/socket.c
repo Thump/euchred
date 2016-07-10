@@ -30,39 +30,39 @@
 /* This routine prepares, opens, binds and listens on the server socket */
 void OpenSocket(void)
 {
-	struct sockaddr_in saddr;
-	int optval;
+    struct sockaddr_in saddr;
+    int optval;
 
     debug(GENERAL) fprintf(stderr,"entering OpenSocket()\n");
 
-	memset(&saddr,0,sizeof(saddr));
-	saddr.sin_family=AF_INET;
-	saddr.sin_addr.s_addr=htonl(INADDR_ANY);
-	saddr.sin_port=htons(port);
+    memset(&saddr,0,sizeof(saddr));
+    saddr.sin_family=AF_INET;
+    saddr.sin_addr.s_addr=htonl(INADDR_ANY);
+    saddr.sin_port=htons(port);
 
-	if ( (s=socket(AF_INET,SOCK_STREAM,0)) == -1)
-	{
-		sprintf(tbuffer1,"Error creating socket: %s",strerror(errno));
-		myLog(tbuffer1);
-		Exit();
-	}
+    if ( (s=socket(AF_INET,SOCK_STREAM,0)) == -1)
+    {
+        sprintf(tbuffer1,"Error creating socket: %s",strerror(errno));
+        myLog(tbuffer1);
+        Exit();
+    }
 
-	optval=1;
-	if ( setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(int *)&optval,sizeof(optval))<0)
-	{
-		sprintf(tbuffer1,"Error setting SO_REUSEADDR: %s",strerror(errno));
-		myLog(tbuffer1);
-		Exit();
-	}
+    optval=1;
+    if ( setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(int *)&optval,sizeof(optval))<0)
+    {
+        sprintf(tbuffer1,"Error setting SO_REUSEADDR: %s",strerror(errno));
+        myLog(tbuffer1);
+        Exit();
+    }
 
-	if (bind(s,(const struct sockaddr *)&saddr,sizeof(saddr)) != 0)
-	{
-		sprintf(tbuffer1,"Error binding socket: %s",strerror(errno));
-		myLog(tbuffer1);
-		Exit();
-	}
+    if (bind(s,(const struct sockaddr *)&saddr,sizeof(saddr)) != 0)
+    {
+        sprintf(tbuffer1,"Error binding socket: %s",strerror(errno));
+        myLog(tbuffer1);
+        Exit();
+    }
 
-	listen(s,5);
+    listen(s,5);
 }
 
 
@@ -72,68 +72,69 @@ void OpenSocket(void)
  */
 fd_set DoSelect(void)
 {
-	fd_set rfd;
-	int i,maxfd;
-	struct timeval t;
+    fd_set rfd;
+    int i,maxfd;
+    struct timeval t;
 
-	debug(GENERAL) fprintf(stderr,"entering DoSelect()\n");
+    debug(GENERAL) fprintf(stderr,"entering DoSelect()\n");
 
-	/* this sets the filedescriptor set for the listen socket and
-	 * all existing clients */
-	FD_ZERO(&rfd);
-	FD_SET(s,&rfd);
-	maxfd=s;
-	for (i=0; i<4; i++)
-		if (players[i].state != unconnected)
-		{	FD_SET(players[i].socket,&rfd);
-			maxfd=max(players[i].socket,maxfd);
-		}
-	maxfd++;
+    /* this sets the filedescriptor set for the listen socket and
+     * all existing clients */
+    FD_ZERO(&rfd);
+    FD_SET(s,&rfd);
+    maxfd=s;
+    for (i=0; i<4; i++)
+        if (players[i].state != unconnected)
+        {
+            FD_SET(players[i].socket,&rfd);
+            maxfd=max(players[i].socket,maxfd);
+        }
+    maxfd++;
 
-	/* set out timeout value */
-	t.tv_sec=pollinterval;
-	t.tv_usec=0;
+    /* set out timeout value */
+    t.tv_sec=pollinterval;
+    t.tv_usec=0;
 
-	i=select(maxfd,&rfd,NULL,NULL,&t);
+    i=select(maxfd,&rfd,NULL,NULL,&t);
 
-	return(rfd);
+    return(rfd);
 }
 
 
 /* This routine takes a pointer to an integer: the contents of that integer
  * are modified to hold a socket accepted from the server listen socket,
- * and a pointer to the text of the socket's IP address is returned. 
+ * and a pointer to the text of the socket's IP address is returned.
  */
 char *AcceptSocket(int *client)
 {
-	int size;
-	struct sockaddr_in saddr;
-	char *ip;
+    int size;
+    struct sockaddr_in saddr;
+    char *ip;
 
-	debug(GENERAL) fprintf(stderr,"entering AcceptSocket()\n");
+    debug(GENERAL) fprintf(stderr,"entering AcceptSocket()\n");
 
     size=sizeof(saddr);
     *client=accept(s,(struct sockaddr *)&saddr,(socklen_t *)&size);
 
-	ip=strdup(inet_ntoa(saddr.sin_addr));
-	lomem(ip);
+    ip=strdup(inet_ntoa(saddr.sin_addr));
+    lomem(ip);
 
-	return(ip);
+    return(ip);
 }
 
 
 /* maps a socket number to a client: -1 means no known client */
 int Socket2Client(int sock)
 {
-	int i;
+    int i;
 
-	debug(GENERAL) fprintf(stderr,"entering Socket2Client()\n");
+    debug(GENERAL) fprintf(stderr,"entering Socket2Client()\n");
 
-	for (i=0; i<game.players; i++)
-		if (players[i].socket == sock)
-			return(i);
+    for (i=0; i<game.players; i++)
+        if (players[i].socket == sock)
+            return(i);
 
-	return(-1);
+    return(-1);
 }
 
 
@@ -142,19 +143,19 @@ int Socket2Client(int sock)
  */
 void SendMsg(int sock, char *buffer, int size)
 {
-	int written=0;
+    int written=0;
 
-	debug(GENERAL) fprintf(stderr,"entering SendMsg()\n");
+    debug(GENERAL) fprintf(stderr,"entering SendMsg()\n");
 
-	written=write(sock,buffer,size);
+    written=write(sock,buffer,size);
 
-	/* Theoretically we should be catching EPIPE here, to avoid problems
-	 * writing to a disconnected client.  We don't care, since we catch
-	 * those with the select() loop.
-	 */
+    /* Theoretically we should be catching EPIPE here, to avoid problems
+     * writing to a disconnected client.  We don't care, since we catch
+     * those with the select() loop.
+     */
 
-	debug(SEND) fprintf(stderr,"sent %d of %d bytes to client %d\n",
-		written,size,Socket2Client(sock));
+    debug(SEND) fprintf(stderr,"sent %d of %d bytes to client %d\n",
+        written,size,Socket2Client(sock));
 }
 
 
@@ -166,9 +167,9 @@ void SendMsg(int sock, char *buffer, int size)
  */
 int ReadMsg(int sock, char *buffer, int size)
 {
-	debug(GENERAL) fprintf(stderr,"entering ReadMsg()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadMsg()\n");
 
-	return(read(sock,buffer,size));
+    return(read(sock,buffer,size));
 }
 
 
@@ -179,42 +180,45 @@ int ReadMsg(int sock, char *buffer, int size)
  */
 char *ReadString(int pnum)
 {
-	char *tmp;
-	int len;
+    char *tmp;
+    int len;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadString()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadString()\n");
 
-	if ( ! ReadInt(pnum,&len) )
-	{	sprintf(tbuffer1,"Short string header from %d (%s)",
-			pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Short message");
-		return(NULL);
-	}
+    if ( ! ReadInt(pnum,&len) )
+    {
+        sprintf(tbuffer1,"Short string header from %d (%s)",
+            pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Short message");
+        return(NULL);
+    }
 
-	if (len > maxmsglen)
-	{	sprintf(tbuffer1,"Oversized string (%d) from %d (%s)",
-			len,pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Oversized message");
-		return(NULL);
-	}
+    if (len > maxmsglen)
+    {
+        sprintf(tbuffer1,"Oversized string (%d) from %d (%s)",
+            len,pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Oversized message");
+        return(NULL);
+    }
 
-	if ( ! BytesReady(players[pnum].socket,len) )
-	{	sprintf(tbuffer1,"Short string from %d (%s)",
-			pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Short message");
-		return(NULL);
-	}
+    if ( ! BytesReady(players[pnum].socket,len) )
+    {
+        sprintf(tbuffer1,"Short string from %d (%s)",
+            pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Short message");
+        return(NULL);
+    }
 
-	tmp=(char *)malloc(len+1);
-	lomem(tmp);
-	memset(tmp,0,len+1);
+    tmp=(char *)malloc(len+1);
+    lomem(tmp);
+    memset(tmp,0,len+1);
 
-	ReadMsg(players[pnum].socket,(char *)tmp,len);
+    ReadMsg(players[pnum].socket,(char *)tmp,len);
 
-	return(tmp);
+    return(tmp);
 }
 
 
@@ -225,23 +229,24 @@ char *ReadString(int pnum)
  */
 boolean ReadInt(int pnum, int *data)
 {
-	int len;
+    int len;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadInt()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadInt()\n");
 
-	if ( ! IntReady(players[pnum].socket) )
-	{	sprintf(tbuffer1,"Short integer from %d (%s)",
-			pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Short message");
-		return false;
-	}
+    if ( ! IntReady(players[pnum].socket) )
+    {
+        sprintf(tbuffer1,"Short integer from %d (%s)",
+            pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Short message");
+        return false;
+    }
 
-	ReadMsg(players[pnum].socket,(char *)&len,4);
-	len=UnpackInt(len);
+    ReadMsg(players[pnum].socket,(char *)&len,4);
+    len=UnpackInt(len);
 
-	*data=len;
-	return(true);
+    *data=len;
+    return(true);
 }
 
 
@@ -252,23 +257,24 @@ boolean ReadInt(int pnum, int *data)
  */
 boolean ReadShort(int pnum, short *data)
 {
-	short len;
+    short len;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadShort()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadShort()\n");
 
-	if ( ! ShortReady(players[pnum].socket) )
-	{	sprintf(tbuffer1,"Missing tail from %d (%s)",
-			pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Missing tail");
-		return false;
-	}
+    if ( ! ShortReady(players[pnum].socket) )
+    {
+        sprintf(tbuffer1,"Missing tail from %d (%s)",
+            pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Missing tail");
+        return false;
+    }
 
-	ReadMsg(players[pnum].socket,(char *)&len,2);
-	len=UnpackShort(len);
+    ReadMsg(players[pnum].socket,(char *)&len,2);
+    len=UnpackShort(len);
 
-	*data=len;
-	return(true);
+    *data=len;
+    return(true);
 }
 
 
@@ -279,23 +285,24 @@ boolean ReadShort(int pnum, short *data)
  */
 boolean ReadBoolean(int pnum, boolean *data)
 {
-	boolean len;
+    boolean len;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadBoolean()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadBoolean()\n");
 
-	if ( ! BooleanReady(players[pnum].socket) )
-	{	sprintf(tbuffer1,"Short boolean from %d (%s)",
-			pnum,players[pnum].playername);
-		myLog(tbuffer1);
-		KickClient(pnum,"Short message");
-		return false;
-	}
+    if ( ! BooleanReady(players[pnum].socket) )
+    {
+        sprintf(tbuffer1,"Short boolean from %d (%s)",
+            pnum,players[pnum].playername);
+        myLog(tbuffer1);
+        KickClient(pnum,"Short message");
+        return false;
+    }
 
-	ReadMsg(players[pnum].socket,(char *)&len,4);
-	len=UnpackBoolean(len);
+    ReadMsg(players[pnum].socket,(char *)&len,4);
+    len=UnpackBoolean(len);
 
-	*data=len;
-	return(true);
+    *data=len;
+    return(true);
 }
 
 
@@ -305,9 +312,9 @@ boolean ReadBoolean(int pnum, boolean *data)
  */
 boolean IntReady(int sock)
 {
-	debug(GENERAL) fprintf(stderr,"entering IntReady()\n");
+    debug(GENERAL) fprintf(stderr,"entering IntReady()\n");
 
-	return(BytesReady(sock,4));
+    return(BytesReady(sock,4));
 }
 
 
@@ -317,9 +324,9 @@ boolean IntReady(int sock)
  */
 boolean ShortReady(int sock)
 {
-	debug(GENERAL) fprintf(stderr,"entering ShortReady()\n");
+    debug(GENERAL) fprintf(stderr,"entering ShortReady()\n");
 
-	return(BytesReady(sock,2));
+    return(BytesReady(sock,2));
 }
 
 
@@ -329,9 +336,9 @@ boolean ShortReady(int sock)
  */
 boolean BooleanReady(int sock)
 {
-	debug(GENERAL) fprintf(stderr,"entering BooleanReady()\n");
+    debug(GENERAL) fprintf(stderr,"entering BooleanReady()\n");
 
-	return(BytesReady(sock,4));
+    return(BytesReady(sock,4));
 }
 
 
@@ -341,14 +348,14 @@ boolean BooleanReady(int sock)
  */
 boolean BytesReady(int sock, int n)
 {
-	int available;
+    int available;
 
-	debug(GENERAL) fprintf(stderr,"entering BytesReady()\n");
+    debug(GENERAL) fprintf(stderr,"entering BytesReady()\n");
 
-	ioctl(sock,FIONREAD,&available);
+    ioctl(sock,FIONREAD,&available);
 
-	if (available > n-1)
-		return true;
-	else
-		return false;
+    if (available > n-1)
+        return true;
+    else
+        return false;
 }

@@ -29,13 +29,13 @@
  */
 int PackInt(char *buffer, int data)
 {
-	int tmp;
+    int tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering PackInt()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackInt()\n");
 
-	tmp=htonl(data);
-	memcpy(buffer,&tmp,4);
-	return(4);
+    tmp=htonl(data);
+    memcpy(buffer,&tmp,4);
+    return(4);
 }
 
 
@@ -45,13 +45,13 @@ int PackInt(char *buffer, int data)
  */
 int PackBoolean(char *buffer, boolean data)
 {
-	int tmp;
+    int tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering PackBoolean()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackBoolean()\n");
 
-	tmp=htonl(data);
-	memcpy(buffer,&tmp,4);
-	return(4);
+    tmp=htonl(data);
+    memcpy(buffer,&tmp,4);
+    return(4);
 }
 
 
@@ -61,13 +61,13 @@ int PackBoolean(char *buffer, boolean data)
  */
 int PackShort(char *buffer, short data)
 {
-	short tmp;
+    short tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering PackShort()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackShort()\n");
 
-	tmp=htons(data);
-	memcpy(buffer,&tmp,2);
-	return(2);
+    tmp=htons(data);
+    memcpy(buffer,&tmp,2);
+    return(2);
 }
 
 
@@ -76,12 +76,12 @@ int PackShort(char *buffer, short data)
  */
 int UnpackInt(int data)
 {
-	int tmp;
+    int tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering UnpackInt()\n");
+    debug(GENERAL) fprintf(stderr,"entering UnpackInt()\n");
 
-	tmp=ntohl(data);
-	return(tmp);
+    tmp=ntohl(data);
+    return(tmp);
 }
 
 
@@ -90,12 +90,12 @@ int UnpackInt(int data)
  */
 short UnpackShort(short data)
 {
-	int tmp;
+    int tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering UnpackShort()\n");
+    debug(GENERAL) fprintf(stderr,"entering UnpackShort()\n");
 
-	tmp=ntohs(data);
-	return(tmp);
+    tmp=ntohs(data);
+    return(tmp);
 }
 
 
@@ -104,12 +104,12 @@ short UnpackShort(short data)
  */
 boolean UnpackBoolean(boolean data)
 {
-	boolean tmp;
+    boolean tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering UnpackBoolean()\n");
+    debug(GENERAL) fprintf(stderr,"entering UnpackBoolean()\n");
 
-	tmp=ntohl(data);
-	return(tmp);
+    tmp=ntohl(data);
+    return(tmp);
 }
 
 
@@ -121,16 +121,16 @@ boolean UnpackBoolean(boolean data)
  */
 int PackString(char *buffer, char *data)
 {
-	int len=0,size=0;
+    int len=0,size=0;
 
-	debug(GENERAL) fprintf(stderr,"entering PackString()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackString()\n");
 
-	/* if the string is null, we leave len with its preinit value of 0 */
-	if (data != NULL)
-		len=strlen(data);
-	size=PackInt(buffer,len);
-	memcpy(buffer+size,data,len);
-	return(len+size);
+    /* if the string is null, we leave len with its preinit value of 0 */
+    if (data != NULL)
+        len=strlen(data);
+    size=PackInt(buffer,len);
+    memcpy(buffer+size,data,len);
+    return(len+size);
 }
 
 
@@ -143,14 +143,14 @@ int PackString(char *buffer, char *data)
  */
 char *UnpackString(char *data)
 {
-	char *tmp;
+    char *tmp;
 
-	debug(GENERAL) fprintf(stderr,"entering PackString()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackString()\n");
 
-	tmp=malloc(strlen(data)*sizeof(char));
-	lomem(tmp);
-	strcpy(tmp,data);
-	return(tmp);
+    tmp=malloc(strlen(data)*sizeof(char));
+    lomem(tmp);
+    strcpy(tmp,data);
+    return(tmp);
 }
 
 
@@ -161,11 +161,11 @@ char *UnpackString(char *data)
  */
 int PackPlayer(char *buffer, int pnum)
 {
-	int size=0;
+    int size=0;
 
-	debug(GENERAL) fprintf(stderr,"entering PackPlayer()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackPlayer()\n");
 
-	/* <pN> : <pstate> <pdata>
+    /* <pN> : <pstate> <pdata>
      *   <pstate> : {0|1|2} # unconnected, connected, joined
      *   <pdata> : if <pstate> == joined
      *               <ph> <nmstring> <clstring> <hwstring> <osstring>
@@ -173,54 +173,54 @@ int PackPlayer(char *buffer, int pnum)
      *               <madeit> <alone> <defend> <offer> <card> <passed>
      *      <team> : {-1|0|1} # no team, team 0, or team 1
      *      <creator>|<ordered>|<dealer>|<alone>|<defend>|<lead>|<maker>|
-	 *      <playoffer>|<orderoffer>|<dropoffer>|<calloffer>|<defendoffer>|
-	 *      <passed> : <boolean>
-	 *      <card> : card in play
-	 */
+     *      <playoffer>|<orderoffer>|<dropoffer>|<calloffer>|<defendoffer>|
+     *      <passed> : <boolean>
+     *      <card> : card in play
+     */
 
-	/* pstate */
-	if (players[pnum].state == unconnected)
-		size+=PackInt(buffer+size,0);
-	else if (players[pnum].state == connected)
-		size+=PackInt(buffer+size,1);
-	else if (players[pnum].state == joined)
-		size+=PackInt(buffer+size,2);
+    /* pstate */
+    if (players[pnum].state == unconnected)
+        size+=PackInt(buffer+size,0);
+    else if (players[pnum].state == connected)
+        size+=PackInt(buffer+size,1);
+    else if (players[pnum].state == joined)
+        size+=PackInt(buffer+size,2);
 
-	/* if the client hasn't joined, we're done */
-	if (players[pnum].state != joined)
-		return(size);
+    /* if the client hasn't joined, we're done */
+    if (players[pnum].state != joined)
+        return(size);
 
-	/* otherwise pack the rest of this shit */
-	size+=PackInt(buffer+size,players[pnum].ph);
-	size+=PackString(buffer+size,players[pnum].playername);
-	size+=PackString(buffer+size,players[pnum].clientname);
-	size+=PackString(buffer+size,players[pnum].hardware);
-	size+=PackString(buffer+size,players[pnum].OS);
-	size+=PackString(buffer+size,players[pnum].comment);
-	size+=PackInt(buffer+size,players[pnum].team);
-	size+=PackInt(buffer+size,players[pnum].numcards);
-	size+=PackBoolean(buffer+size,players[pnum].creator);
-	size+=PackBoolean(buffer+size,players[pnum].ordered);
-	size+=PackBoolean(buffer+size,players[pnum].dealer);
-	size+=PackBoolean(buffer+size,players[pnum].alone);
-	size+=PackBoolean(buffer+size,players[pnum].defend);
-	size+=PackBoolean(buffer+size,players[pnum].leader);
-	size+=PackBoolean(buffer+size,players[pnum].maker);
+    /* otherwise pack the rest of this shit */
+    size+=PackInt(buffer+size,players[pnum].ph);
+    size+=PackString(buffer+size,players[pnum].playername);
+    size+=PackString(buffer+size,players[pnum].clientname);
+    size+=PackString(buffer+size,players[pnum].hardware);
+    size+=PackString(buffer+size,players[pnum].OS);
+    size+=PackString(buffer+size,players[pnum].comment);
+    size+=PackInt(buffer+size,players[pnum].team);
+    size+=PackInt(buffer+size,players[pnum].numcards);
+    size+=PackBoolean(buffer+size,players[pnum].creator);
+    size+=PackBoolean(buffer+size,players[pnum].ordered);
+    size+=PackBoolean(buffer+size,players[pnum].dealer);
+    size+=PackBoolean(buffer+size,players[pnum].alone);
+    size+=PackBoolean(buffer+size,players[pnum].defend);
+    size+=PackBoolean(buffer+size,players[pnum].leader);
+    size+=PackBoolean(buffer+size,players[pnum].maker);
 
-	/* and the offers */
-	size+=PackBoolean(buffer+size,players[pnum].playoffer);
-	size+=PackBoolean(buffer+size,players[pnum].orderoffer);
-	size+=PackBoolean(buffer+size,players[pnum].dropoffer);
-	size+=PackBoolean(buffer+size,players[pnum].calloffer);
-	size+=PackBoolean(buffer+size,players[pnum].defendoffer);
+    /* and the offers */
+    size+=PackBoolean(buffer+size,players[pnum].playoffer);
+    size+=PackBoolean(buffer+size,players[pnum].orderoffer);
+    size+=PackBoolean(buffer+size,players[pnum].dropoffer);
+    size+=PackBoolean(buffer+size,players[pnum].calloffer);
+    size+=PackBoolean(buffer+size,players[pnum].defendoffer);
 
-	/* and current card in play */
-	size+=PackBoolean(buffer+size,players[pnum].cardinplay);
-	if ( players[pnum].cardinplay )
-		size+=PackCard(buffer+size,players[pnum].card);
-	size+=PackBoolean(buffer+size,players[pnum].passed);
+    /* and current card in play */
+    size+=PackBoolean(buffer+size,players[pnum].cardinplay);
+    if ( players[pnum].cardinplay )
+        size+=PackCard(buffer+size,players[pnum].card);
+    size+=PackBoolean(buffer+size,players[pnum].passed);
 
-	return(size);
+    return(size);
 }
 
 
@@ -231,22 +231,22 @@ int PackPlayer(char *buffer, int pnum)
  */
 int PackCards(char *buffer, int pnum)
 {
-	int size=0,i;
+    int size=0,i;
 
-	debug(GENERAL) fprintf(stderr,"entering PackCards()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackCards()\n");
 
-	/* <cards> : <numcards> <card1> .. <cardN>
-	 *   <cardN> : <value> <suit>
-	 *     <value> : {2|3|4|5|6|7|8|9|10|11|12|13|14}
-	 *     <suit> : {0|1|2|3}
-	 */
+    /* <cards> : <numcards> <card1> .. <cardN>
+     *   <cardN> : <value> <suit>
+     *     <value> : {2|3|4|5|6|7|8|9|10|11|12|13|14}
+     *     <suit> : {0|1|2|3}
+     */
 
-	size+=PackInt(buffer+size,players[pnum].numcards);
+    size+=PackInt(buffer+size,players[pnum].numcards);
 
-	for (i=0; i<players[pnum].numcards; i++)
-		size+=PackCard(buffer+size,players[pnum].cards[i]);
+    for (i=0; i<players[pnum].numcards; i++)
+        size+=PackCard(buffer+size,players[pnum].cards[i]);
 
-	return(size);
+    return(size);
 }
 
 
@@ -257,17 +257,17 @@ int PackCards(char *buffer, int pnum)
  */
 int PackCard(char *buffer, Card card)
 {
-	int size=0;
+    int size=0;
 
-	debug(GENERAL) fprintf(stderr,"entering PackCard()\n");
+    debug(GENERAL) fprintf(stderr,"entering PackCard()\n");
 
-	/*   <card> : <value> <suit>
-	 *     <value> : {2|3|4|5|6|7|8|9|10|11|12|13|14}
-	 *     <suit> : {0|1|2|3}
-	 */
+    /*   <card> : <value> <suit>
+     *     <value> : {2|3|4|5|6|7|8|9|10|11|12|13|14}
+     *     <suit> : {0|1|2|3}
+     */
 
-	size+=PackInt(buffer+size,card.value);
-	size+=PackInt(buffer+size,card.suit);
+    size+=PackInt(buffer+size,card.value);
+    size+=PackInt(buffer+size,card.suit);
 
-	return(size);
+    return(size);
 }

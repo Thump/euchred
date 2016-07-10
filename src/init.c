@@ -25,33 +25,33 @@
  */
 void Initialize(int argc, char **argv)
 {
-	debug(GENERAL) fprintf(stderr,"entering Initialize()\n");
+    debug(GENERAL) fprintf(stderr,"entering Initialize()\n");
 
-	/* We read the switches first, then read the config file, then we
-	 * re-read the switches.  This lets us use -F to reset the config file,
-	 * but still allows switches to over-ride the config file.  A bit
-	 * inelegant, but better than messy option locking.
-	 */
-	ReadSwitch(argc,argv);
-	ReadConfig();
-	ReadSwitch(argc,argv);
-	
-	/* Open the log file */
-	OpenLog();
+    /* We read the switches first, then read the config file, then we
+     * re-read the switches.  This lets us use -F to reset the config file,
+     * but still allows switches to over-ride the config file.  A bit
+     * inelegant, but better than messy option locking.
+     */
+    ReadSwitch(argc,argv);
+    ReadConfig();
+    ReadSwitch(argc,argv);
 
-	myLog("Starting euchre server");
+    /* Open the log file */
+    OpenLog();
 
-	/* initialize game and player structures */
-	InitData();
+    myLog("Starting euchre server");
 
-	/* create listening socket */
-	OpenSocket();
+    /* initialize game and player structures */
+    InitData();
 
-	/* set signals */
-	SetSignal();
+    /* create listening socket */
+    OpenSocket();
 
-	/* initialize our random number generator */
-	srand(time(NULL));
+    /* set signals */
+    SetSignal();
+
+    /* initialize our random number generator */
+    srand(time(NULL));
 }
 
 
@@ -60,39 +60,39 @@ void Initialize(int argc, char **argv)
  */
 void ReadSwitch(int argc, char **argv)
 {
-	int opt;
+    int opt;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadSwitch()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadSwitch()\n");
 
-	/* We step through the command line switches */
-	while ((opt=getopt(argc,argv,"h?d:v:p:F:L:")) != EOF)
-	{
-		if (opt == 'F')
-		{
-			config=strdup(optarg);
-			lomem(config);
-		}
-		
-		if (opt == 'd')
-			df=atoi(optarg);
-		
-		if (opt == 'v')
-			vl=atoi(optarg);
+    /* We step through the command line switches */
+    while ((opt=getopt(argc,argv,"h?d:v:p:F:L:")) != EOF)
+    {
+        if (opt == 'F')
+        {
+            config=strdup(optarg);
+            lomem(config);
+        }
 
-		if (opt == 'p')
-			port=atoi(optarg);
-		
-		if (opt == 'L')
-			lomem(logfile=strdup(optarg));
+        if (opt == 'd')
+            df=atoi(optarg);
 
-		if (opt == '?')
-			Usage();
+        if (opt == 'v')
+            vl=atoi(optarg);
 
-		if (opt == 'h')
-			Usage();
-	}
-	/* reset optind to 1, so we can reprocess the switches later */
-	optind=1;
+        if (opt == 'p')
+            port=atoi(optarg);
+
+        if (opt == 'L')
+            lomem(logfile=strdup(optarg));
+
+        if (opt == '?')
+            Usage();
+
+        if (opt == 'h')
+            Usage();
+    }
+    /* reset optind to 1, so we can reprocess the switches later */
+    optind=1;
 }
 
 
@@ -101,85 +101,86 @@ void ReadSwitch(int argc, char **argv)
  */
 void ReadConfig(void)
 {
-	int result1=0,result2=0;
-	int linecount=0;
+    int result1=0,result2=0;
+    int linecount=0;
 
-	debug(GENERAL) fprintf(stderr,"entering ReadConfig()\n");
+    debug(GENERAL) fprintf(stderr,"entering ReadConfig()\n");
 
-	/* attempt to open config file, error and return if we can't */
-	configF=fopen(config,"r");
-	if (configF==NULL)
-	{
-		sprintf(tbuffer1,"Error opening config %s: %s",
-			config,strerror(errno));
-		myLog(tbuffer1);
-		return;
-	}
-
-
-	/* This while loop steps through the lines in the config file,
-	 * parsing those it can figure out, ignoring anything containing
-	 * only blanks, or text preceded by a #, and declaring (and then
-	 * ignoring) crap.
-	 * 
-	 * Because of our line limit on fgets, we can only read lines of SSIZE
-	 * or less.  At time of writing, set to 10240, it shouldn't be too
-	 * much of an issue.
-	 */
-	while (fgets(tbuffer1,SSIZE,configF) != NULL)
-	{
-		/* increment a counter for our lines */
-		linecount++;
+    /* attempt to open config file, error and return if we can't */
+    configF=fopen(config,"r");
+    if (configF==NULL)
+    {
+        sprintf(tbuffer1,"Error opening config %s: %s",
+            config,strerror(errno));
+        myLog(tbuffer1);
+        return;
+    }
 
 
-		/* if its of valid form, try and read it, ignore unknown names */
-		result1=sscanf(tbuffer1," %[^#= \t\n] = %[^#\n]",tbuffer2,tbuffer3);
-		if (result1 == 2)
-		{
-			if (!strcmp("logfile",tbuffer2))
-				lomem(logfile=strdup(tbuffer3));
-			
-			if (!strcmp("port",tbuffer2))
-				port=atoi(tbuffer3);
-			
-			if (!strcmp("debug",tbuffer2))
-				df=atoi(tbuffer3);
-			
-			if (!strcmp("verbosity",tbuffer2))
-				vl=atoi(tbuffer3);
-			
-			if (!strcmp("maxmsgwait",tbuffer2))
-				maxmsgwait=atoi(tbuffer3);
-
-			continue;
-		}
+    /* This while loop steps through the lines in the config file,
+     * parsing those it can figure out, ignoring anything containing
+     * only blanks, or text preceded by a #, and declaring (and then
+     * ignoring) crap.
+     *
+     * Because of our line limit on fgets, we can only read lines of SSIZE
+     * or less.  At time of writing, set to 10240, it shouldn't be too
+     * much of an issue.
+     */
+    while (fgets(tbuffer1,SSIZE,configF) != NULL)
+    {
+        /* increment a counter for our lines */
+        linecount++;
 
 
-		/* see if it matches an ignorable line */
-		result1=sscanf(tbuffer1," %[#]",tbuffer2);
-		result2=sscanf(tbuffer1," %[\n\r]",tbuffer2);
-		if (result1==1 || result2<0)
-			continue;
+        /* if its of valid form, try and read it, ignore unknown names */
+        result1=sscanf(tbuffer1," %[^#= \t\n] = %[^#\n]",tbuffer2,tbuffer3);
+        if (result1 == 2)
+        {
+            if (!strcmp("logfile",tbuffer2))
+                lomem(logfile=strdup(tbuffer3));
 
-		
-		sprintf(tbuffer1,"unknown syntax error in %s at line %d: ignored"
-			,config,linecount);
-		myLog(tbuffer1);
-	}
+            if (!strcmp("port",tbuffer2))
+                port=atoi(tbuffer3);
 
-	/* close our config file */
-	fclose(configF);
+            if (!strcmp("debug",tbuffer2))
+                df=atoi(tbuffer3);
+
+            if (!strcmp("verbosity",tbuffer2))
+                vl=atoi(tbuffer3);
+
+            if (!strcmp("maxmsgwait",tbuffer2))
+                maxmsgwait=atoi(tbuffer3);
+
+            continue;
+        }
+
+
+        /* see if it matches an ignorable line */
+        result1=sscanf(tbuffer1," %[#]",tbuffer2);
+        result2=sscanf(tbuffer1," %[\n\r]",tbuffer2);
+        if (result1==1 || result2<0)
+            continue;
+
+
+        sprintf(tbuffer1,"unknown syntax error in %s at line %d: ignored"
+            ,config,linecount);
+        myLog(tbuffer1);
+    }
+
+    /* close our config file */
+    fclose(configF);
 }
 
 
 /* This routine initializes the game data structure. */
 void InitData(void)
-{	int pnum;
+{
+    int pnum;
 
-	debug(GENERAL) fprintf(stderr,"entering InitData()\n");
+    debug(GENERAL) fprintf(stderr,"entering InitData()\n");
 
-	ClearGame();
-	for (pnum=0; pnum<4; pnum++)
-		ClearPlayer(pnum);
-	ClearHand();
+    ClearGame();
+    for (pnum=0; pnum<4; pnum++)
+        ClearPlayer(pnum);
+    ClearHand();
 }
