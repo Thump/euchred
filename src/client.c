@@ -813,8 +813,9 @@ void ClientStart(int pnum)
 	/* then do it */
 	game.ingame=true;
 	NewHand();
+    SendState();
+    SendDeal();
 	NextAction();
-	SendState();
 }
 
 
@@ -1322,8 +1323,9 @@ void ClientCallPass(int pnum)
 			myLog(tbuffer1);
 			ClearHand();
 			NewHand();
+            SendState();
+            SendDeal();
 			NextAction();
-			SendState();
 			return;
 		}
 	}
@@ -1478,28 +1480,37 @@ void ClientPlay(int pnum)
 
 	/* Check that the user has an offer outstanding */
 	if ( ! players[pnum].playoffer )
-	{	SendPlayDeny(pnum,"Play not offered.");
+	{
 		sprintf(tbuffer1,"Player %s tried to play without offer",
 			players[pnum].playername);
 		myLog(tbuffer1);
+        SendPlayDeny(pnum,"Play not offered.");
 		return;
 	}
 
 	/* check that the player actually has that card */
 	if ( ! HasCard(pnum,card))
-	{	SendPlayDeny(pnum,"You don't possess that card.");
+	{
 		sprintf(tbuffer1,"Player %s tried to play unowned card",
 			players[pnum].playername);
 		myLog(tbuffer1);
+        SendPlayDeny(pnum,"You don't possess that card.");
+
+        // we resend the play offer, to trigger the client to try again
+        SendPlayOffer(pnum);
 		return;
 	}
 
 	/* check that player is playing a valid card */
 	if ( ! ValidPlay(pnum,card))
-	{	SendPlayDeny(pnum,"Must follow suit.");
+	{
 		sprintf(tbuffer1,"Player %s tried to play invalid card",
 			players[pnum].playername);
 		myLog(tbuffer1);
+        SendPlayDeny(pnum,"Must follow suit.");
+
+        // we resend the play offer, to trigger the client to try again
+        SendPlayOffer(pnum);
 		return;
 	}
 

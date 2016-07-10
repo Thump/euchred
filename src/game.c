@@ -245,7 +245,6 @@ void NewHand()
 	PickDealer();
 
 	/* create, shuffle, deal and sort the cards */
-	SendDeal();
 	if (deck != NULL)
 		free(deck);
 	deck=NewDeck();
@@ -388,6 +387,8 @@ void NextAction()
 
 	ClearHand();
 	NewHand();
+    SendState();
+	SendDeal();
 	NextOrder();
 }
 
@@ -541,9 +542,6 @@ boolean NextDefend()
     */
 	for (i=current; i!=hand.maker; i=(i+1)%4)
     {
-        sprintf(tbuffer1,"looking at %d", i);
-        myLog(tbuffer1);
-            
 		if (players[i].team != players[hand.maker].team)
 		{	players[i].defendoffer=true;
             sprintf(tbuffer1,"sending DEFENDOFFER to %s (%d)",
@@ -588,43 +586,62 @@ boolean NextPlay()
 
 	/* if we have no current offers, choose a leader and offer it to her */
 	if (current == -1)
-	{	PickLeader();
+	{
+        // pick a leader for the game, ie. the first player to the left
+        // of the dealer
+        PickLeader();
+        // once we've got a leader, make sure everyone knows about it
+        SendState();
+        // tell everyone who's got the play offer
 		for (i=0; i<4; i++)
 			if (players[i].leader)
 			{	players[i].playoffer=true;
+                sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
+                    players[i].playername,i);
 				SendPlayOffer(i);
 				return(true);
 			}
 	}
 
-	/* if the current offer is to the person prior to the leader, or if
-	 * it is to the person prior to the person prior to the leader, and
-	 * the person after the leader is either defending or alone, or if it
-	 * is to the person after the leader, and both the leader and the person
-	 * after the leader are either going alone or defending alone, then
-	 * the trick is over: evaluate it, reset the trick, recompute the
+	/* - if the current offer is to the person prior to the leader
+     * - or if it is to the person prior to the person prior to the leader,
+     *   and the person after the leader is either defending or alone
+     * - or if it is to the person after the leader, and both the leader
+     *   and the person after the leader are either going alone or
+     *   defending alone
+     * then the trick is over: evaluate it, reset the trick, recompute the
 	 * leader, offer to the leader, and return
 	 *
 	 * Would you like parmesan cheese or ground pepper with that?
+     *
+     * If none of that is true, 
 	 */
-	if (players[(current+1)%4].leader ||
+	if (// 4 player game
+        players[(current+1)%4].leader ||
 
+        // 3 player game, with an alone or a defend
 		( players[(current+2)%4].leader &&
 		  (players[(current+3)%4].alone || players[(current+3)%4].defend)) ||
 
+        // 2 player game, both an alone and a defend
 		(players[(current+3)%4].leader &&
 		  ( (players[current].alone || players[current].defend) &&
 		    (players[(current+3)%4].alone || players[(current+3)%4].defend)
 		  )
 	    )
 	   )
-	{	EvaluateCards();
+	{
+        // trick is over, figure out who won this hand
+        EvaluateCards();
 
-		/* Check if the hand is over: if the making team has 5 tricks, if
-		 * if the making team has 3 or more tricks and the defending team
-		 * has 1, or if the defending team has 3 or more tricks, do the
-	 	 * scores and return false.  Otherwise, clear current plays,
-		 * and return.  (Next leader was set in EvaluateCards().
+		/* Check if the game is over:
+         *  - if the making team has 5 tricks
+         *  - if the making team has 3 or more tricks and the defending
+         *    team has 1
+         *  - if the defending team has 3 or more tricks
+         * do the appropriate scores and return false.  Otherwise, clear
+         * current plays, and return.  (Next leader was set in
+         * EvaluateCards().
 		 */
 
 		/* set the team variables */
@@ -730,23 +747,39 @@ boolean NextPlay()
 		return(true);
 	}
 
-	/* the default fall through: there is already an offer made, and
-	 * there is a valid next player, so just offer to the next in line
+	/* the default fall through: this means we've already sent out one
+     * play offer, and there is a valid next player, so just offer to the
+     * next in line
 	 */
 	if ( !players[(current+3)%4].alone && !players[(current+3)%4].defend)
-	{	players[(current+1)%4].playoffer=true;
+	{	
+        players[(current+1)%4].playoffer=true;
+        sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
+            players[(current+1)%4].playername,(current+1)%4);
+        SendState();
+		SendPlayOffer((current+1)%4);
 		return(true);
 	}
 
 	if ( !players[current].alone && !players[current].defend)
-	{	players[(current+2)%4].playoffer=true;
+	{	
+        players[(current+2)%4].playoffer=true;
+        sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
+            players[(current+2)%4].playername,(current+2)%4);
+        SendState();
+		SendPlayOffer((current+2)%4);
 		return(true);
 	}
 
 	if ((players[current].alone || players[current].defend) &&
 		(players[(current+3)%4].alone || players[(current+3)%4].defend)
 	   )
-	{	players[(current+3)%4].playoffer=true;
+	{	
+        players[(current+3)%4].playoffer=true;
+        sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
+            players[(current+3)%4].playername,(current+3)%4);
+        SendState();
+		SendPlayOffer((current+3)%4);
 		return(true);
 	}
 
@@ -841,6 +874,8 @@ void EvaluateCards()
 	}
 
 	/* we tell people about it, before setting the next state */
+    sprintf(tbuffer1,"trick over, %s won",players[winner].playername);
+    myLog(tbuffer1);
 	sprintf(tbuffer1,"Server: %s won the trick with %s",
 		players[winner].playername,CardText(winningcard));
 	SendChat(tbuffer1);

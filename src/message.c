@@ -144,8 +144,7 @@ void SendChat(char *chat)
 
 /* Sends the state of the current game.  The intention is that this will
  * provide enough information for a virgin client to join the game.  This
- * routine is called with a specific target client: repeat for all active
- * clients for a broadcast to all clients.
+ * routine will send the state information to all player.
  */
 void SendState()
 {	int size=0,i,tsize=0,spacer;
