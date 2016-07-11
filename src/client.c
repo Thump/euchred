@@ -1532,16 +1532,16 @@ void ClientPlay(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientPlay()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): PLAY",
-        pnum,players[pnum].playername);
-    myLog(tbuffer1);
-
     /* <msg> : <PLAY> <gh> <ph> <value> <suit> <tail> */
     if ( ! ReadInt(pnum,&gh) ) return;
     if ( ! ReadInt(pnum,&ph) ) return;
     if ( ! ReadInt(pnum,&(card.value)) ) return;
     if ( ! ReadInt(pnum,&(card.suit)) ) return;
     if ( ! TailCheck(pnum)) return;
+
+    sprintf(tbuffer1,"Servicing %d (%s): PLAY %s",
+        pnum,players[pnum].playername,CardName(card));
+    myLog(tbuffer1);
 
     /* Check that the player handle makes sense: use pnum if different */
     if (ph != pnum)

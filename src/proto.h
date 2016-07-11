@@ -24,6 +24,7 @@ boolean TailCheck(int pnum);
 boolean UnpackBoolean(boolean data);
 boolean ValidPlay(int pnum, Card card);
 char *AcceptSocket(int *client);
+char *CardName(Card card);
 char *CardText(Card card);
 char *PrintSuit(int suit);
 char *ReadString(int pnum);

@@ -380,11 +380,10 @@ void NextAction()
         if ( NextPlay() )
             return;
 
-    /* If we got here, the hand is over: we check here for game over
-     * states (one of the teams having a score greater than 9).  If the
-     * game isn't over, we clear the current hand, deal the new hand,
-     * and call NextOrder() before returning.
-     */
+    // If we got here, the hand is over
+
+    // we check here for game over states (one of the teams having a
+    // score greater than 9)
     if (game.score[0] > 9)
     {
         GameOver(0);
@@ -396,6 +395,8 @@ void NextAction()
         return;
     }
 
+    // nope, game isn't over, so prep a new hand, send it to the clients,
+    // send the deal message and start the ordering process
     ClearHand();
     NewHand();
     SendState();
@@ -622,12 +623,15 @@ boolean NextPlay()
             {   players[i].playoffer=true;
                 sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
                     players[i].playername,i);
+                myLog(tbuffer1);
+                fprintf(stderr,"play offer to %s\n",players[i].playername);
                 SendPlayOffer(i);
                 return(true);
             }
     }
 
-    /* - if the current offer is to the person prior to the leader
+    /* check for conditions where the trick is over:
+     * - if the current offer is to the person prior to the leader
      * - or if it is to the person prior to the person prior to the leader,
      *   and the person after the leader is either defending or alone
      * - or if it is to the person after the leader, and both the leader
@@ -638,20 +642,26 @@ boolean NextPlay()
      *
      * Would you like parmesan cheese or ground pepper with that?
      *
-     * If none of that is true,
+     * If none of that is true, the if clause will be false, which means
+     * the hand isn't over yet, so send the next player a play offer
      */
-    if (// 4 player game
-        players[(current+1)%4].leader ||
+    if (
+        // 4 player game
+        ( players[(current+1)%4].leader )
+
+        ||
 
         // 3 player game, with an alone or a defend
-        ( players[(current+2)%4].leader &&
-          (players[(current+3)%4].alone || players[(current+3)%4].defend)) ||
+        (  players[(current+2)%4].leader &&
+          (players[(current+3)%4].alone || players[(current+3)%4].defend)
+        )
+
+        ||
 
         // 2 player game, both an alone and a defend
-        (players[(current+3)%4].leader &&
-          ( (players[current].alone || players[current].defend) &&
-            (players[(current+3)%4].alone || players[(current+3)%4].defend)
-          )
+        (  players[(current+3)%4].leader &&
+          (players[current].alone || players[current].defend) &&
+          (players[(current+3)%4].alone || players[(current+3)%4].defend)
         )
        )
     {
@@ -686,18 +696,22 @@ boolean NextPlay()
             else if (players[i].team == defendteam+1)
                 defender2=i;
 
-        /* check the makers got 'em all */
+        /* check if the makers got 'em all */
         if (hand.tricks[maketeam] == 5)
         {
             /* by going alone? */
             if (players[hand.maker].alone)
-            {   sprintf(tbuffer1,
+            {  
+                sprintf(tbuffer1,
                     "Server: %s went alone and got all 5 tricks: 4 points."
                     ,players[hand.maker].playername);
+                myLog(tbuffer1);
                 SendChat(tbuffer1);
-                SendState();
-                SendHandOver();
                 game.score[maketeam]+=4;
+                sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                    game.score[0],game.score[1]);
+                myLog(tbuffer1);
+                SendHandOver();
                 return(false);
             }
             else /* nope */
@@ -705,10 +719,13 @@ boolean NextPlay()
                 sprintf(tbuffer1,
                     "Server: %s and %s took all 5 tricks: 2 points.",
                     players[maker1].playername,players[maker2].playername);
+                myLog(tbuffer1);
                 SendChat(tbuffer1);
-                SendState();
-                SendHandOver();
                 game.score[maketeam]+=2;
+                sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                    game.score[0],game.score[1]);
+                myLog(tbuffer1);
+                SendHandOver();
                 return(false);
             }
         }
@@ -717,69 +734,87 @@ boolean NextPlay()
         if (hand.tricks[maketeam]>2 && hand.tricks[defendteam]>0)
         {
             sprintf(tbuffer1,
-        		"Server: %s and %s were stopped at %d tricks: 1 point.",
-        		players[maker1].playername,players[maker2].playername,
-        		hand.tricks[maketeam]);
-        	SendState();
-        	SendChat(tbuffer1);
-        	SendHandOver();
-        	game.score[maketeam]++;
-        		return(false);
+                "Server: %s and %s were stopped at %d tricks: 1 point.",
+                players[maker1].playername,players[maker2].playername,
+                hand.tricks[maketeam]);
+            myLog(tbuffer1);
+            SendChat(tbuffer1);
+            game.score[maketeam]++;
+            sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                game.score[0],game.score[1]);
+            myLog(tbuffer1);
+            SendHandOver();
+            return(false);
         }
 
         /* did the defenders euchre them? */
         if (hand.tricks[defendteam] > 2)
         {
             /* by defending? */
-        	if (players[defender1].defend)
-        	{
+            if (players[defender1].defend)
+            {
                 sprintf(tbuffer1,
-        			"Server: %s defended and got the euchre: 4 points."
-        			,players[defender1].playername);
-        		SendChat(tbuffer1);
-        		SendState();
-        		SendHandOver();
-        		game.score[defendteam]+=4;
-        		return(false);
-        	} /* the other guy? */
-        	else if (players[defender2].defend)
-        	{
+                    "Server: %s defended and got the euchre: 4 points.",
+                    players[defender1].playername);
+                myLog(tbuffer1);
+                SendChat(tbuffer1);
+                game.score[defendteam]+=4;
+                sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                    game.score[0],game.score[1]);
+                myLog(tbuffer1);
+                SendHandOver();
+                return(false);
+            } /* the other guy? */
+            else if (players[defender2].defend)
+            {
                 sprintf(tbuffer1,
-        			"Server: %s defended and got the euchre: 4 points."
-        			,players[defender2].playername);
-        		SendChat(tbuffer1);
-        		SendState();
-        		SendHandOver();
-        		game.score[defendteam]+=4;
-        		return(false);
-        	}
-        	else /* nope */
-        	{
+                    "Server: %s defended and got the euchre: 4 points.",
+                    players[defender2].playername);
+                myLog(tbuffer1);
+                SendChat(tbuffer1);
+                game.score[defendteam]+=4;
+                sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                    game.score[0],game.score[1]);
+                myLog(tbuffer1);
+                SendHandOver();
+                return(false);
+            }
+            else /* nope */
+            {
                 sprintf(tbuffer1,"Server: %s and %s got euchered: 2 points.",
-        		players[maker1].playername,players[maker2].playername);
-        		SendChat(tbuffer1);
-        		SendState();
-        		SendHandOver();
-        		game.score[defendteam]+=2;
-        		return(false);
-        	}
+                    players[maker1].playername,players[maker2].playername);
+                myLog(tbuffer1);
+                SendChat(tbuffer1);
+                game.score[defendteam]+=2;
+                sprintf(tbuffer1,"team 0: %d  team 1: %d",
+                    game.score[0],game.score[1]);
+                myLog(tbuffer1);
+                SendHandOver();
+                return(false);
+            }
         }
 
-        /* Okay, if we got here, the hand isn't over: clear the current
-         * plays and return.  We don't worry about setting the leader
-         * and offering the play: EvaluateCards() did this already.
+        /* Okay, if we got here, the trick is over, but the hand isn't:
+         * clear the current plays and return.  We don't worry about
+         * setting the leader and offering the play: EvaluateCards() did
+         * this already.
          */
         for (i=0; i<4; i++)
         {
             players[i].cardinplay=false;
-        	players[i].card.suit=-1;
-        	players[i].card.value=-1;
+            players[i].card.suit=-1;
+            players[i].card.value=-1;
+            if (players[i].leader == 1)
+            {
+                fprintf(stderr,"play offer to %s\n",players[i].playername);
+                SendPlayOffer(i);
+            }
         }
         return(true);
     }
 
     /* the default fall through: this means we've already sent out one
-     * play offer, and there is a valid next player, so just offer to the
+     * play offer, and the trick isn't over yet, so just offer to the
      * next in line
      */
     if ( !players[(current+3)%4].alone && !players[(current+3)%4].defend)
@@ -787,6 +822,7 @@ boolean NextPlay()
         players[(current+1)%4].playoffer=true;
         sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
             players[(current+1)%4].playername,(current+1)%4);
+        myLog(tbuffer1);
         SendState();
         SendPlayOffer((current+1)%4);
         return(true);
@@ -797,6 +833,7 @@ boolean NextPlay()
         players[(current+2)%4].playoffer=true;
         sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
             players[(current+2)%4].playername,(current+2)%4);
+        myLog(tbuffer1);
         SendState();
         SendPlayOffer((current+2)%4);
         return(true);
@@ -809,6 +846,7 @@ boolean NextPlay()
         players[(current+3)%4].playoffer=true;
         sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
             players[(current+3)%4].playername,(current+3)%4);
+        myLog(tbuffer1);
         SendState();
         SendPlayOffer((current+3)%4);
         return(true);
@@ -831,8 +869,8 @@ boolean ValidPlay(int pnum, Card card)
     leader=-1;
     for (i=0; i<4; i++)
         if (players[i].state == joined)
-        	if (players[i].leader)
-        		leader=i;
+            if (players[i].leader)
+                leader=i;
 
     if (leader==-1)
     {
@@ -878,12 +916,12 @@ void EvaluateCards()
         if (players[i].cardinplay)
         {
             if (players[i].leader)
-        	{
+            {
                 leader=i;
-        		leadsuit=SuitOf(players[i].card);
-        	}
-        	cards[numcards]=players[i].card;
-        	numcards++;
+                leadsuit=SuitOf(players[i].card);
+            }
+            cards[numcards]=players[i].card;
+            numcards++;
         }
     }
     trumpsuit=hand.suit;
@@ -903,9 +941,9 @@ void EvaluateCards()
     winner=-1;
     for (i=0; i<4; i++)
         if (players[i].cardinplay &&
-        	players[i].card.suit == winningcard.suit &&
-        	players[i].card.value == winningcard.value)
-        	winner=i;
+            players[i].card.suit == winningcard.suit &&
+            players[i].card.value == winningcard.value)
+            winner=i;
     if (winner == -1)
     {
         myLog("Shitfuck, can't find winning card");
@@ -918,7 +956,6 @@ void EvaluateCards()
     sprintf(tbuffer1,"Server: %s won the trick with %s",
         players[winner].playername,CardText(winningcard));
     SendChat(tbuffer1);
-    SendState();
     SendTrickOver();
 
     /* increment the trick count and set new leader, and indicate they
@@ -928,7 +965,8 @@ void EvaluateCards()
     players[leader].leader=false;
     players[winner].leader=true;
     players[winner].playoffer=true;
-    SendPlayOffer(winner);
+    SendState();
+    // SendPlayOffer(winner);
 }
 
 
@@ -958,18 +996,18 @@ Card HiCard(Card card1, Card card2, int leadsuit, int trumpsuit)
     if ( card1.suit == leadsuit && card2.suit == leadsuit )
     {
         if ( card1.value > card2.value )
-        	return(card1);
+            return(card1);
         else
-        	return(card2);
+            return(card2);
     }
 
     /* If both cards are trump, reuturn the card with the higher value. */
     if ( card1.suit == trumpsuit && card2.suit == trumpsuit )
     {
         if ( card1.value > card2.value )
-        	return(card1);
+            return(card1);
         else
-        	return(card2);
+            return(card2);
     }
 
     /* If one card is trump and the other not, return the trump.  */
@@ -1007,19 +1045,19 @@ void GameOver(int winningteam)
      */
     for (i=0; i<4; i++)
         if (players[i].team == winningteam+1)
-        	winner1=i;
+            winner1=i;
     for (i=3; i>-1; i--)
         if (players[i].team == winningteam+1)
-        	winner2=i;
+            winner2=i;
 
     losingteam=winningteam+1;
     if (losingteam>2) losingteam=1;
 
     /* tell em all */
     sprintf(tbuffer1,
-        "Server: %s and %s have won with a score of %d to %d.",
-        players[winner1].playername,players[winner2].playername,
-        game.score[winningteam],game.score[losingteam]);
+        "Server: team 0: %d  team 1: %d.", game.score[0],game.score[1]);
+    myLog(tbuffer1);
+    SendState();
     SendChat(tbuffer1);
     SendChat("Server: Game over.");
     SendGameOver();

@@ -179,18 +179,32 @@ void PrintCards(Card *cards, int numcards)
 /* Prints a single card */
 void PrintCard(Card card)
 {
-    if (card.value < 11) fprintf(stderr,"%d",card.value);
-    else if (card.value == 11) fprintf(stderr,"J");
-    else if (card.value == 12) fprintf(stderr,"Q");
-    else if (card.value == 13) fprintf(stderr,"K");
-    else if (card.value == 14) fprintf(stderr,"A");
+    fprintf(stderr,CardName(card));
+}
 
-    if (card.suit == 0) fprintf(stderr,"c");
-    if (card.suit == 1) fprintf(stderr,"d");
-    if (card.suit == 2) fprintf(stderr,"h");
-    if (card.suit == 3) fprintf(stderr,"s");
 
-    fprintf(stderr," ");
+/* returns a string with the card name in it */
+char *CardName(Card card)
+{
+    char value,suit;
+    static char buffer[10];
+
+    value = ' ';
+    suit  = ' ';
+    if      (card.value ==  9) value = '9';
+    else if (card.value == 10) value = 'T';
+    else if (card.value == 11) value = 'J';
+    else if (card.value == 12) value = 'Q';
+    else if (card.value == 13) value = 'K';
+    else if (card.value == 14) value = 'A';
+
+    if (card.suit == 0) suit = 'c';
+    if (card.suit == 1) suit = 'd';
+    if (card.suit == 2) suit = 'h';
+    if (card.suit == 3) suit = 's';
+
+    sprintf(buffer,"%c%c",value,suit);
+    return(buffer);
 }
 
 

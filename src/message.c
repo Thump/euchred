@@ -419,6 +419,7 @@ void SendHandOver()
     int size=0,spacer,i;
 
     debug(GENERAL) fprintf(stderr,"entering SendHandOver()\n");
+    fprintf(stderr,"sending HANDOVER\n");
 
     /* <msglen> <HANDOVER> <tail> */
     spacer=sizeof(size);
@@ -452,7 +453,7 @@ void SendGameOver()
 /* This routine sends a PLAYOFFER message to all players */
 void SendPlayOffer(int pnum)
 {
-    int size=0,spacer,i;
+    int size=0,spacer;
 
     debug(GENERAL) fprintf(stderr,"entering SendPlayOffer()\n");
 
@@ -463,8 +464,9 @@ void SendPlayOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    for (i=0; i<4; i++)
-        SendMsg(players[i].socket,dbuffer,size+spacer);
+    //for (int i=0; i<4; i++)
+    //    SendMsg(players[i].socket,dbuffer,size+spacer);
+    SendMsg(players[pnum].socket,dbuffer,size+spacer);
 }
 
 
