@@ -339,7 +339,8 @@ void JoinClient(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering JoinClient()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): JOIN",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): JOIN",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <JOIN> <protocol> <string> <tail> */
@@ -480,7 +481,8 @@ void ClientQuit(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientQuit()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): QUIT",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): QUIT",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <CLIENTQUIT> <gh> <ph> <string> <tail> */
@@ -518,7 +520,8 @@ void ClientID(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ID()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): ID",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): ID",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <ID> <gameh> <playerh> <data> <tail>
@@ -593,7 +596,8 @@ void ClientChat(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientChat()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): CHAT",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): CHAT",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <CHAT> <gameh> <playerh> <string> <tail> */
@@ -669,8 +673,8 @@ void ClientKick(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientKick()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): CLIENTKICK",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): CLIENTKICK",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <CLIENTKICK> <gh> <ph> <targetph> <tail> */
@@ -725,8 +729,8 @@ void ClientOptions(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientOptions()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): OPTIONS",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): OPTIONS",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <msglen> <OPTIONS> <gh> <ph> <candefend>
@@ -785,8 +789,8 @@ void ClientStart(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientStart()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): START",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): START",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <START> <gh> <ph> <tail> */
@@ -853,7 +857,8 @@ void ClientEnd(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientEnd()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): END",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): END",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <END> <gh> <ph> <tail> */
@@ -900,7 +905,8 @@ void ClientOrder(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientOrder()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): ORDER",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): ORDER",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <ORDER> <gh> <ph> <tail> */
@@ -988,8 +994,8 @@ void ClientOrderAlone(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientOrderAlone()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): ORDERALONE",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): ORDERALONE",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <ORDERALONE> <gh> <ph> <tail> */
@@ -1071,8 +1077,8 @@ void ClientOrderPass(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientOrderPass()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): ORDERPASS",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): ORDERPASS",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <ORDERPASS> <gh> <ph> <tail> */
@@ -1126,7 +1132,8 @@ void ClientDrop(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientDrop()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): DROP",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): DROP",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <DROP> <gh> <ph> <card.value> <card.suit> <tail> */
@@ -1196,7 +1203,8 @@ void ClientCall(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientCall()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): CALL",pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): CALL",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <ORDER> <gh> <ph> <card.suit> <tail> */
@@ -1270,8 +1278,8 @@ void ClientCallAlone(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientCallAlone()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): CALLALONE",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): CALLALONE",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <CALLALONE> <gh> <ph> <suit> <tail> */
@@ -1337,8 +1345,8 @@ void ClientCallPass(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientCallPass()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): CALLPASS",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): CALLPASS",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <CALLPASS> <gh> <ph> <tail> */
@@ -1419,8 +1427,8 @@ void ClientDefend(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientDefend()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): DEFEND",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): DEFEND",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <DEFEND> <gh> <ph> <tail> */
@@ -1477,8 +1485,8 @@ void ClientDefendPass(int pnum)
 
     debug(GENERAL) fprintf(stderr,"entering ClientDefendPass()\n");
 
-    sprintf(tbuffer1,"Servicing %d (%s): DEFENDPASS",
-        pnum,players[pnum].playername);
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): DEFENDPASS",
+        pnum,players[pnum].playername,players[pnum].team);
     myLog(tbuffer1);
 
     /* <msg> : <DEFENDPASS> <gh> <ph> <tail> */
@@ -1539,8 +1547,8 @@ void ClientPlay(int pnum)
     if ( ! ReadInt(pnum,&(card.suit)) ) return;
     if ( ! TailCheck(pnum)) return;
 
-    sprintf(tbuffer1,"Servicing %d (%s): PLAY %s",
-        pnum,players[pnum].playername,CardName(card));
+    sprintf(tbuffer1,"Servicing %d (%s, team %d): PLAY %s",
+        pnum,players[pnum].playername,players[pnum].team,CardName(card));
     myLog(tbuffer1);
 
     /* Check that the player handle makes sense: use pnum if different */

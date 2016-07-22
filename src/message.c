@@ -419,7 +419,6 @@ void SendHandOver()
     int size=0,spacer,i;
 
     debug(GENERAL) fprintf(stderr,"entering SendHandOver()\n");
-    fprintf(stderr,"sending HANDOVER\n");
 
     /* <msglen> <HANDOVER> <tail> */
     spacer=sizeof(size);

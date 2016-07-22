@@ -621,10 +621,9 @@ boolean NextPlay()
         for (i=0; i<4; i++)
             if (players[i].leader)
             {   players[i].playoffer=true;
-                sprintf(tbuffer1,"sending PLAYOFFER to %s (%d)",
-                    players[i].playername,i);
+                sprintf(tbuffer1,"sending PLAYOFFER to %s (team %d)",
+                    players[i].playername,players[i].team);
                 myLog(tbuffer1);
-                fprintf(stderr,"play offer to %s\n",players[i].playername);
                 SendPlayOffer(i);
                 return(true);
             }
@@ -711,6 +710,7 @@ boolean NextPlay()
                 sprintf(tbuffer1,"team 0: %d  team 1: %d",
                     game.score[0],game.score[1]);
                 myLog(tbuffer1);
+                SendState();
                 SendHandOver();
                 return(false);
             }
@@ -725,6 +725,7 @@ boolean NextPlay()
                 sprintf(tbuffer1,"team 0: %d  team 1: %d",
                     game.score[0],game.score[1]);
                 myLog(tbuffer1);
+                SendState();
                 SendHandOver();
                 return(false);
             }
@@ -743,6 +744,7 @@ boolean NextPlay()
             sprintf(tbuffer1,"team 0: %d  team 1: %d",
                 game.score[0],game.score[1]);
             myLog(tbuffer1);
+            SendState();
             SendHandOver();
             return(false);
         }
@@ -762,6 +764,7 @@ boolean NextPlay()
                 sprintf(tbuffer1,"team 0: %d  team 1: %d",
                     game.score[0],game.score[1]);
                 myLog(tbuffer1);
+                SendState();
                 SendHandOver();
                 return(false);
             } /* the other guy? */
@@ -776,6 +779,7 @@ boolean NextPlay()
                 sprintf(tbuffer1,"team 0: %d  team 1: %d",
                     game.score[0],game.score[1]);
                 myLog(tbuffer1);
+                SendState();
                 SendHandOver();
                 return(false);
             }
@@ -789,6 +793,7 @@ boolean NextPlay()
                 sprintf(tbuffer1,"team 0: %d  team 1: %d",
                     game.score[0],game.score[1]);
                 myLog(tbuffer1);
+                SendState();
                 SendHandOver();
                 return(false);
             }
@@ -806,7 +811,6 @@ boolean NextPlay()
             players[i].card.value=-1;
             if (players[i].leader == 1)
             {
-                fprintf(stderr,"play offer to %s\n",players[i].playername);
                 SendPlayOffer(i);
             }
         }
@@ -1038,28 +1042,13 @@ Card HiCard(Card card1, Card card2, int leadsuit, int trumpsuit)
 /* Game over routine */
 void GameOver(int winningteam)
 {
-    int i,winner1=-1,winner2=-1,losingteam;
-
-    /* Yeahyeahyeah, whatever, you think you code so hot, where's
-     * -your- euchre server?
-     */
-    for (i=0; i<4; i++)
-        if (players[i].team == winningteam+1)
-            winner1=i;
-    for (i=3; i>-1; i--)
-        if (players[i].team == winningteam+1)
-            winner2=i;
-
-    losingteam=winningteam+1;
-    if (losingteam>2) losingteam=1;
-
     /* tell em all */
     sprintf(tbuffer1,
-        "Server: team 0: %d  team 1: %d.", game.score[0],game.score[1]);
+        "Server: team 0: %d  team 1: %d", game.score[0],game.score[1]);
     myLog(tbuffer1);
     SendState();
     SendChat(tbuffer1);
-    SendChat("Server: Game over.");
+    SendChat("Server: Game over");
     SendGameOver();
 
     /* then reset everything for the next game */
