@@ -1614,5 +1614,4 @@ void ClientPlay(int pnum)
     RemoveCard(pnum,card);
 
     NextAction();
-    SendState();
 }
