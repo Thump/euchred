@@ -135,6 +135,11 @@ void SendChat(char *chat)
 
     debug(GENERAL) fprintf(stderr,"entering SendChat()\n");
 
+    /* chat messages are not useful for computer players, so if we've
+     * been told to do minimal protocol, then skip chat messages
+     */
+    if ( minimal ) return;
+
     /* <msglen> <CHAT> <string> <tail> */
     spacer=sizeof(size);
     size =PackInt(dbuffer+spacer,CHAT);
@@ -463,9 +468,11 @@ void SendPlayOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    //for (int i=0; i<4; i++)
-    //    SendMsg(players[i].socket,dbuffer,size+spacer);
-    SendMsg(players[pnum].socket,dbuffer,size+spacer);
+    /* if we're on minimal protocol, only send the offer to the target */
+    if ( minimal )
+    { SendMsg(players[pnum].socket,dbuffer,size+spacer); }
+    else
+    { for (int i=0; i<4; i++) SendMsg(players[i].socket,dbuffer,size+spacer); }
 }
 
 
@@ -483,8 +490,11 @@ void SendDefendOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    for (i=0; i<4; i++)
-        SendMsg(players[i].socket,dbuffer,size+spacer);
+    /* if we're on minimal protocol, only send the offer to the target */
+    if ( minimal )
+    { SendMsg(players[pnum].socket,dbuffer,size+spacer); }
+    else
+    { for (i=0; i<4; i++) SendMsg(players[i].socket,dbuffer,size+spacer); }
 }
 
 
@@ -502,8 +512,11 @@ void SendCallOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    for (i=0; i<4; i++)
-        SendMsg(players[i].socket,dbuffer,size+spacer);
+    /* if we're on minimal protocol, only send the offer to the target */
+    if ( minimal )
+    { SendMsg(players[pnum].socket,dbuffer,size+spacer); }
+    else
+    { for (i=0; i<4; i++) SendMsg(players[i].socket,dbuffer,size+spacer); }
 }
 
 
@@ -521,8 +534,11 @@ void SendOrderOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    for (i=0; i<4; i++)
-        SendMsg(players[i].socket,dbuffer,size+spacer);
+    /* if we're on minimal protocol, only send the offer to the target */
+    if ( minimal )
+    { SendMsg(players[pnum].socket,dbuffer,size+spacer); }
+    else
+    { for (i=0; i<4; i++) SendMsg(players[i].socket,dbuffer,size+spacer); }
 }
 
 
@@ -540,8 +556,11 @@ void SendDropOffer(int pnum)
     size+=PackShort(dbuffer+spacer+size,TAIL);
     PackInt(dbuffer,size);
 
-    for (i=0; i<4; i++)
-        SendMsg(players[i].socket,dbuffer,size+spacer);
+    /* if we're on minimal protocol, only send the offer to the target */
+    if ( minimal )
+    { SendMsg(players[pnum].socket,dbuffer,size+spacer); }
+    else
+    { for (i=0; i<4; i++) SendMsg(players[i].socket,dbuffer,size+spacer); }
 }
 
 
