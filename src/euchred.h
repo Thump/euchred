@@ -60,6 +60,9 @@ extern FILE *logF;
 /* debug flag */
 extern int df;
 
+/* minimal protocol flag */
+extern int minimal;
+
 /* verbosity level  */
 extern int vl;
 
