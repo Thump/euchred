@@ -65,7 +65,7 @@ void ReadSwitch(int argc, char **argv)
     debug(GENERAL) fprintf(stderr,"entering ReadSwitch()\n");
 
     /* We step through the command line switches */
-    while ((opt=getopt(argc,argv,"h?d:v:p:F:L:")) != EOF)
+    while ((opt=getopt(argc,argv,"h?d:v:p:F:L:m")) != EOF)
     {
         if (opt == 'F')
         {
@@ -84,6 +84,9 @@ void ReadSwitch(int argc, char **argv)
 
         if (opt == 'L')
             lomem(logfile=strdup(optarg));
+
+        if (opt == 'm')
+            minimal=1;
 
         if (opt == '?')
             Usage();
