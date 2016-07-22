@@ -800,26 +800,26 @@ boolean NextPlay()
         }
 
         /* Okay, if we got here, the trick is over, but the hand isn't:
-         * clear the current plays and return.  We don't worry about
-         * setting the leader and offering the play: EvaluateCards() did
-         * this already.
+         * clear the current plays and return.  We clear the current cards
+         * in play, and send the updated state to the clients, and then
+         * send the new leader (which was set in EvaluateCard()) the play
+         * offer
          */
         for (i=0; i<4; i++)
         {
             players[i].cardinplay=false;
             players[i].card.suit=-1;
             players[i].card.value=-1;
-            if (players[i].leader == 1)
-            {
-                SendPlayOffer(i);
-            }
         }
+        SendState();
+        for (i=0; i<4; i++)
+            if (players[i].leader == 1)
+            SendPlayOffer(i);
         return(true);
     }
 
-    /* the default fall through: this means we've already sent out one
-     * play offer, and the trick isn't over yet, so just offer to the
-     * next in line
+    /* the default fall through: this means the tricks isn't over yet,
+     * but we've got a lead, so just offer play to the next in line
      */
     if ( !players[(current+3)%4].alone && !players[(current+3)%4].defend)
     {
@@ -960,17 +960,18 @@ void EvaluateCards()
     sprintf(tbuffer1,"Server: %s won the trick with %s",
         players[winner].playername,CardText(winningcard));
     SendChat(tbuffer1);
+    hand.tricks[players[winner].team-1]++;
+    SendState();
     SendTrickOver();
 
-    /* increment the trick count and set new leader, and indicate they
-     * should play
+    /* clear the old leader, and set the new leader and playoffer: we won't
+     * send the next play offer until we return to NextPlay(), but since
+     * we only have visibility to the winner in this routine, we need to
+     * set the next leader now
      */
-    hand.tricks[players[winner].team-1]++;
     players[leader].leader=false;
     players[winner].leader=true;
     players[winner].playoffer=true;
-    SendState();
-    // SendPlayOffer(winner);
 }
 
 
