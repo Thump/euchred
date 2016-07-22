@@ -35,6 +35,17 @@ Requirements
 
 ---------------------------------------------------------------------------
 
+Getting It
+
+  To get a copy of this code, it can be cloned from github with:
+
+    git clone git@github.com:Thump/euchred
+
+  This will create a directory called euchred, and copy the latest source
+  into it.
+
+---------------------------------------------------------------------------
+
 Making It
 
   Just type in make from the top level directory (the one containing
