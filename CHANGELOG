@@ -1,0 +1,201 @@
+commit 539371bc9496751c2f5a7a55f6977351b0cb0e4a
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:26:29 2016 -0600
+
+    Support for minimal global variable
+    
+     - the minimal global variable is set when we want to reduce the protocol
+       overhead at the possible expense of making some server actions unclear
+       from the client perspective; specifically, we only tell targets about
+       offers, and never send chat messages; I was hoping this would increase
+       the hands/s measure of the client, but it only had a limited benefit:
+       sad face
+     - if minimal is set, don't send chat messages
+     - only send offers to their target
+
+commit 4b9bc1dd431992d16521fbe40ecad32ab773e994
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:26:05 2016 -0600
+
+    Support for minimal global variable
+
+commit 1fb5e087d414670c853ec7e26d2b249efcdfb0c3
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:25:47 2016 -0600
+
+    Support for minimal global variable
+
+commit eb8bbc8c6d4341d1b40080ce36df1b2a9502ab59
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:22:46 2016 -0600
+
+    Several protocol cleanups
+    
+     - call SendState() once we've cleared the current cards after a trick is over
+     - separated out the SendPlayOffer() from the clearing of the cards
+     - call SendState() once tricks have been updated: this is needed for the
+       client to calculate trick deltas correctly
+     - removed extra SendState() in EvaluateCards()
+     - some comment updates
+
+commit f824b1d31a064d405e0c2bb350e61bcb5428e86a
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:22:13 2016 -0600
+
+    Added a "minimal" global variable
+
+commit a536e86a21f59b1d22862580251c788b1c207377
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:21:41 2016 -0600
+
+    Removed a superfluous SendState()
+
+commit 3eb69c05aa313008b6274103359854b83695b7c2
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:21:08 2016 -0600
+
+    Removed this file: it used to build perl files from C code, but since I removed the perl client, it's not needed any more
+
+commit 87362dc367430871f1b22c4bf3e4426474086f8b
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 13:20:26 2016 -0600
+
+    Added a realclean target as an alias for distclean, since I can never remember which one it is
+
+commit 333cdc57291911be5adb17ca4cb3894dc047684a
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Fri Jul 22 01:01:22 2016 -0600
+
+    Client is working consistently, so tidying up the code
+    
+     - added a SendState() before SendHandOver(): without this, clients didn't
+       have enough information to determine the post-hand state when the
+       HANDOVER message was received
+     - removed some code cruft in GameOver()
+     - removed some extra logs
+     - added team information to some existing logs
+     - some tidying up of perl related files
+     - added files for gitignore
+
+commit de867bb839eec0c3c9723954f0f0b98092ab2c29
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sun Jul 10 21:54:51 2016 -0600
+
+    Complete game can now be played, yay!
+    
+     - various additions to logging, to see what's going on inside
+     - improvements to various comments, as usual
+     - added SendState() at various points: sometimes we weren't pushing
+       updated state information to the clients before we sent them an event
+       they were expected to act on
+     - some more tab -> space changes *sigh*
+     - fixed bug where were sending a play offer to the winner of a hand before
+       the new hand was dealt: this was acceptable for manual clients, when the
+       lag was long enough that the client had the new cards before acting, but
+       not for the automated client, since it was triggering a new play with
+       no cards to play from
+     - we now only send play offers to the targeted player: this was to reduce
+       log chatty-ness, but also reduces network and server load; I'll likely
+       make a similar change to other offers as well
+     - added CardName() function, which takes a card and returns a string name
+       for it; then changed PrintCard() to use the new CardName() function
+
+commit 0cc1442c4944fb23ae4c16f8ed19974734c919e8
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sat Jul 9 22:38:30 2016 -0600
+
+    White space fixes
+    
+     - Hard coded tabs?  Seriously 1999 Denis, what were you thinking?
+
+commit 7ee28eaacb1e250ecf3f44d57709f8ebfd82b90f
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sat Jul 9 22:00:18 2016 -0600
+
+    Bug fixes found from developing the peuchre client
+    
+     - added new SendState() commands, to make sure the client has up to date
+       information to act on for DEAL, PLAY, etc messages
+     - after we get a bad play, re-send the play offer, to prompt the client
+       to act again
+     - send play offers in cases where we weren't before, makes it easier to
+       code clients to respond, rather than having them monitor the state
+     - reformatted some comments
+
+commit db269a92e5eb8d012a20638258d5e382ab540515
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sat Jul 9 02:59:23 2016 -0600
+
+    fixed the defend offer processing, yay!
+
+commit 9583b0ac1156133dbc59ee2d4ca557d824c6a872
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Tue Jul 5 20:46:46 2016 -0600
+
+    Updated my email
+
+commit e41da3a0b3524f6c186035abee85e6275dc32692
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Tue Jul 5 20:30:55 2016 -0600
+
+    A bunch of source and build changes to support moving the client name from euchres to euchred, and removal of the perl client
+
+commit edb8ee307f711ef23e8a030f025ad1a77a442109
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Tue Jul 5 20:19:50 2016 -0600
+
+    Moved euchres/ dir to be src/, as part of stripping out perl client
+
+commit a3b356d5e7cceeb24914239852902d50ca31a403
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Tue Jul 5 20:18:31 2016 -0600
+
+    Began stripping out the perl euchre client, to make it a separate project
+
+commit fa72fbbfbecc8ffe7eec7952d5969d02490f0618
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Thu Jun 30 00:24:12 2016 -0600
+
+    adjust docs and code comments to align with code
+
+commit 932c6b3cfd292265ea7466ad1a652cdfb33ea5e4
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Wed Jun 22 21:38:35 2016 -0600
+
+    - various code changes to tidy up warnings
+
+commit 45ef1f465c52269a7542c38f4ec83ec76368f349
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Wed Jun 22 21:21:19 2016 -0600
+
+    - removed spurious +1 in sort command
+
+commit 0be7800e5052156190c0dbf49cf9527d633fc30c
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Wed Jun 22 21:12:14 2016 -0600
+
+     - changed log() to myLog() to avoid conflict with internal log()
+
+commit a2c6d54f6767c3f7a7e4eeff004a9a02dbe45958
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Wed Jun 22 21:00:01 2016 -0600
+
+     - changed text constant for euchre server header: used to broken across several lines, now it's a single line with embedded newlines
+
+commit f2fef0b5c6b08766d5d2b37e91d1319532beff6c
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Wed Jun 22 20:59:15 2016 -0600
+
+     - added removal of euchres.log file to distclean Makefile target
+
+commit 962cd01090061f7366e11d412debdedcf51bded4
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sun Jun 12 22:29:21 2016 -0600
+
+    Updated README file
+
+commit 7db8ebfdb618a49e1ae2a4a4adf5aeae303976a5
+Author: Denis McLaughlin <mclaughlin.denis@gmail.com>
+Date:   Sun Jun 12 20:59:17 2016 -0600
+
+    initial commit
