@@ -18,6 +18,8 @@ $(SERVER): src/*.h src/*.c common/*.h
 clean:
 	( cd src ; make clean )
 
+realclean: distclean
+
 distclean:
 	( cd src ; make distclean )
 	rm -f euchred.log
