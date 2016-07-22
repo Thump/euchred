@@ -33,6 +33,9 @@ int port=PORT;
 /* default debug flag */
 int df=DF;
 
+/* default minimal protocol flag to 0 */
+int minimal=0;
+
 /* default verbosity: 0 */
 int vl=VL;
 
