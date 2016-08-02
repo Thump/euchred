@@ -209,14 +209,3 @@ int CardCompare(Card *card1, Card *card2)
 
     return(0);
 }
-
-
-/* This routine sorts a player's cards */
-void SortCards()
-{
-    int pnum;
-
-    for (pnum=0; pnum<4; pnum++)
-        qsort(players[pnum].cards,players[pnum].numcards,
-        sizeof(Card),(void *)(*CardCompare));
-}
