@@ -253,8 +253,6 @@ void NewHand()
     deck=NewDeck();
     for (i=0; i<20; i++)
         AddCard(i%4,deck[i]);
-    for (i=0; i<4; i++)
-        SortCards(i);
 
     /* set the hand information */
     hand.hole.suit=deck[20].suit;
