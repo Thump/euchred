@@ -129,7 +129,6 @@ void SendState();
 void SendTrickOver();
 void ServiceClient(int pnum);
 void SetSignal(void);
-void SortCards();
 void TrapHUP(void);
 void TrapINT(void);
 void Usage(void);
