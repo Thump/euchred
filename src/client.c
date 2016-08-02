@@ -949,7 +949,6 @@ void ClientOrder(int pnum)
 
     /* set trump, change to defendoffer state, tell folks, NextAction() */
     hand.suit=hand.hole.suit;
-    SortCards();
     players[pnum].orderoffer=false;
     players[pnum].maker=true;
     hand.maker=pnum;
@@ -1033,7 +1032,6 @@ void ClientOrderAlone(int pnum)
 
     /* set trump, change to defendoffer state, tell folks, NextAction() */
     hand.suit=hand.hole.suit;
-    SortCards();
     players[pnum].orderoffer=false;
     players[pnum].alone=true;
     players[pnum].maker=true;
@@ -1171,8 +1169,12 @@ void ClientDrop(int pnum)
         return;
     }
 
-    /* Check that they have the card they dropped */
-    if ( ! HasCard(pnum,card) )
+    /* if the dropped card isn't in that player's hand, and it's not the
+     * card that was ordered, then they've tried to drop an invalid card,
+     * so complain
+     */
+    if (    ! HasCard(pnum,card)
+         && ! ( card.value == hand.hole.value && card.suit == hand.suit) )
     {
         SendDropDeny(pnum,"Can't drop nonexistent card.");
         sprintf(tbuffer1,"Player %s tried to drop nonexistent card",
@@ -1187,9 +1189,16 @@ void ClientDrop(int pnum)
         hand.hstate=3;
     else
         hand.hstate=4;
-    RemoveCard(pnum,card);
-    AddCard(pnum,hand.hole);
-    SortCards();
+
+    /* if we got here, then we either dropped a card in our hand, or we
+     * dropped the hole card: if it's a card in our drop, remove that card
+     * and add the hole card, otherwise we don't need to do anything
+     */
+    if ( HasCard(pnum,card) )
+    {
+        RemoveCard(pnum,card);
+        AddCard(pnum,hand.hole);
+    }
 
     NextAction();
     SendState();
@@ -1253,7 +1262,6 @@ void ClientCall(int pnum)
 
     /* set trump, change to defendoffer state, tell folks, NextAction() */
     hand.suit=suit;
-    SortCards();
     players[pnum].calloffer=false;
     players[pnum].maker=true;
     hand.maker=pnum;
@@ -1318,7 +1326,6 @@ void ClientCallAlone(int pnum)
 
     /* set trump, change to defendoffer state, tell folks, NextAction() */
     hand.suit=suit;
-    SortCards();
     players[pnum].calloffer=false;
     players[pnum].alone=true;
     players[pnum].maker=true;
