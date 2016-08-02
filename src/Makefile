@@ -88,7 +88,7 @@ DISTCLEAN=$(REALCLEAN) .*.vim .*.swp
 
 #*******************************#
 
-$(BIN): proto.h tags ../common/messages.pl ../common/suits.pl $(OBJ)
+$(BIN): proto.h tags $(OBJ)
 	$(CC) $(OBJ) -o $(BIN) $(LDFLAGS) 
 
 all : $(OBJ) 
@@ -110,12 +110,6 @@ distclean:
 
 proto.h: $(SRC)
 	$(MAKESCRIPTS)/mkproto > proto.h
-
-../common/messages.pl: ../common/messages.h
-	$(MAKESCRIPTS)/h2pl ../common/messages.h > ../common/messages.pl
-
-../common/suits.pl: ../common/suits.h
-	$(MAKESCRIPTS)/h2pl ../common/suits.h > ../common/suits.pl
 
 %.o : %.c 
 	$(CC) $(CFLAGS) -c $< -o $@
