@@ -71,22 +71,44 @@ void ReadSwitch(int argc, char **argv)
         {
             config=strdup(optarg);
             lomem(config);
+            sprintf(tbuffer1,"Setting config file to %s",config);
+            myLog(tbuffer1);
         }
 
         if (opt == 'd')
+        {
             df=atoi(optarg);
+            sprintf(tbuffer1,"Setting debug to %d",df);
+            myLog(tbuffer1);
+        }
 
         if (opt == 'v')
+        {
             vl=atoi(optarg);
+            sprintf(tbuffer1,"Setting verbosity to %d",vl);
+            myLog(tbuffer1);
+        }
 
         if (opt == 'p')
+        {
             port=atoi(optarg);
+            sprintf(tbuffer1,"Setting port to %d",port);
+            myLog(tbuffer1);
+        }
 
         if (opt == 'L')
+        {
             lomem(logfile=strdup(optarg));
+            sprintf(tbuffer1,"Setting logfile to %s",logfile);
+            myLog(tbuffer1);
+        }
 
         if (opt == 'm')
+        {
+            sprintf(tbuffer1,"Setting protocol to minimum");
+            myLog(tbuffer1);
             minimal=1;
+        }
 
         if (opt == '?')
             Usage();
