@@ -947,10 +947,12 @@ void ClientOrder(int pnum)
         players[pnum].team==players[hand.dealer].team && !players[pnum].dealer)
         players[pnum].alone=true;
 
-    /* set trump, change to defendoffer state, tell folks, NextAction() */
+    /* set trump, change to defendoffer state, set ordered to true for the
+     * player who ordered */
     hand.suit=hand.hole.suit;
     players[pnum].orderoffer=false;
     players[pnum].maker=true;
+    players[pnum].ordered=true;
     hand.maker=pnum;
 
     if (!players[pnum].dealer &&
